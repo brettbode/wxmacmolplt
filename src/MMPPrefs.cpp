@@ -1234,20 +1234,20 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 			outbuf << AtomLabels[i][j];
 		}
 		if (j>0) atm->addAttribute(MMPPref_convert(MMPAtomAtt_AtomLabel), outbuf.str().c_str());
-		XMLElement * color = atm->addChildElement(MMPPref_convert(MMPPref_ColorXML));
+		XMLElement * lcolor = atm->addChildElement(MMPPref_convert(MMPPref_ColorXML));
 			//Add the color, note the xml file will always use the GL style float values
 		outbuf.str("");
 		outbuf << (AtomColors[i].red/65535.0);
-		color->addAttribute(MMPPref_convert(MMPPref_ColorRed), outbuf.str().c_str());
+		lcolor->addAttribute(MMPPref_convert(MMPPref_ColorRed), outbuf.str().c_str());
 		outbuf.str("");
 		outbuf << (AtomColors[i].green/65535.0);
-		color->addAttribute(MMPPref_convert(MMPPref_ColorGreen), outbuf.str().c_str());
+		lcolor->addAttribute(MMPPref_convert(MMPPref_ColorGreen), outbuf.str().c_str());
 		outbuf.str("");
 		outbuf << (AtomColors[i].blue/65535.0);
-		color->addAttribute(MMPPref_convert(MMPPref_ColorBlue), outbuf.str().c_str());
+		lcolor->addAttribute(MMPPref_convert(MMPPref_ColorBlue), outbuf.str().c_str());
 		outbuf.str("");
 		outbuf << AtomPatterns[i];
-		color->addAttribute(MMPPref_convert(MMPPref_Pattern), outbuf.str().c_str());
+		lcolor->addAttribute(MMPPref_convert(MMPPref_Pattern), outbuf.str().c_str());
 	}
 
 //	XMLElement * CWinlement = root->addChildElement(MMPPref_convert(MMPPref_CoordWinPrefs));

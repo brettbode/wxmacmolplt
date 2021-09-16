@@ -2501,8 +2501,8 @@ void InputBuilderWindow::SetupSummaryItems() {
 			int i=0;
 			while (pgt[i]) {
 				if (pgt[i] == 'N') {
-					wxString temp;
-					temp.Printf(wxT("%d"), TmpInputRec->Data->GetPointGroupOrder());
+					wxString tempPG;
+					tempPG.Printf(wxT("%d"), TmpInputRec->Data->GetPointGroupOrder());
 					pg.Append(temp);
 				} else {
 					pg.Append((char)(pgt[i]), 1);
@@ -4143,24 +4143,24 @@ void InputBuilderWindow::OnGVBPairsEditTextUpdated( wxCommandEvent& event )
 void InputBuilderWindow::OnGVBNSetOeditTextUpdated( wxCommandEvent& event )
 {
 	wxString temp = mGVB_NSETOEdit->GetValue();
-	long t;
-	if (temp.ToLong(&t)) {
-		TmpInputRec->SCF->SetGVBNumOpenShells(t);
+	long newNumShells;
+	if (temp.ToLong(&newNumShells)) {
+		TmpInputRec->SCF->SetGVBNumOpenShells(newNumShells);
 		//now adjust the shell degeneracy array
 		if (TmpInputRec->SCF->GetGVBNumOpenShells() > 0) {
 			mGVB_NOEdit->Show(true);
 			mGVB_NOStatic->Show(true);
-			std::vector<long> t = TmpInputRec->SCF->GetGVBOpenShellDeg();
-			int num = (int) t.size();
+			std::vector<long> degVector = TmpInputRec->SCF->GetGVBOpenShellDeg();
+			int num = (int) degVector.size();
 			if (TmpInputRec->SCF->GetGVBNumOpenShells() > num) {	//This shouldn't happen?
 				for (int i=num; i<TmpInputRec->SCF->GetGVBNumOpenShells(); i++)
-					t.push_back(0);
+					degVector.push_back(0);
 			} else if (TmpInputRec->SCF->GetGVBNumOpenShells() < num)
 				num = (int)TmpInputRec->SCF->GetGVBNumOpenShells();
 			std::ostringstream degString;
 			for (int i=0; i<num; i++) {
 				if (i>0) degString << " ";
-				degString << t[i];
+				degString << degVector[i];
 			}
 			mGVB_NOEdit->SetValue(wxString(degString.str().c_str(), wxConvUTF8));
 		} else {

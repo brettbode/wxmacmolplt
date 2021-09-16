@@ -875,12 +875,12 @@ void AODensity::SetupMemory(long NumBasisFunctions) {
 }
 AODensity * OrbitalRec::GetAODensity(BasisSet * lBasis, long NumAtoms) {
 	if (!TotalAODensity) {
-		long NumBasisFunctions = lBasis->GetNumBasisFuncs(false);
+		long lNumBasisFunctions = lBasis->GetNumBasisFuncs(false);
 		TotalAODensity = new AODensity;
 		if (TotalAODensity) {
-			TotalAODensity->SetupMemory(NumBasisFunctions);
+			TotalAODensity->SetupMemory(lNumBasisFunctions);
 			GetAODensityMatrix(TotalAODensity->GetDensityArray(), NumOccupiedAlphaOrbs,
-				NumOccupiedBetaOrbs, NumBasisFunctions);
+				NumOccupiedBetaOrbs, lNumBasisFunctions);
 			lBasis->GetShellIndexArray(TotalAODensity->GetDensityIndex());
 
 			std::vector<BasisShell> & Shells = lBasis->Shells;

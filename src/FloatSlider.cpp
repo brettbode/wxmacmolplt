@@ -249,13 +249,13 @@ void FloatSlider::SyncText() {
 
 /**
  * Assign slider's minimum value.
- * @param min New minimum.
+ * @param argmin New minimum.
  */
-void FloatSlider::SetMin(float min) {
+void FloatSlider::SetMin(float argmin) {
 
-	this->min = min;
+	this->min = argmin;
 	wxString str;
-	str.Printf(wxT("%.3f"), min);
+	str.Printf(wxT("%.3f"), argmin);
 	min_label->SetLabel(str);
 
 }

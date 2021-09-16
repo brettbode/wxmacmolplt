@@ -702,7 +702,6 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 			long newid;
 			double fval;
 			bool goodVal;
-			MoleculeData * MainData = Parent->GetData();
 			Internals * internals = MainData->GetInternalCoordinates();
 			MOPacInternals * mInts = internals->GetMOPacStyle();
 			if (col & 1) { //odd numbered columns contain the integer connection ids

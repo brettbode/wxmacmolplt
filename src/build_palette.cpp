@@ -524,8 +524,8 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
 
 	// Show lone pair count drop down menu.
-	wxStaticText *lp_num_label = new wxStaticText(myPeriodic_panel, wxID_ANY, wxT("Number of lone pairs: "));
-	sizer->Add(lp_num_label, wxGBPosition(2, 2), wxGBSpan(1, 6), lflags);
+	wxStaticText *mylp_num_label = new wxStaticText(myPeriodic_panel, wxID_ANY, wxT("Number of lone pairs: "));
+	sizer->Add(mylp_num_label, wxGBPosition(2, 2), wxGBSpan(1, 6), lflags);
 
 	wxString LPChoices[] = {_T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5")};
 	mLPChoice = new wxChoice(myPeriodic_panel, kPeriodicLPChoice, wxPoint(-1, -1),

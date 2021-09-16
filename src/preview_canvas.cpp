@@ -358,7 +358,7 @@ int PreviewCanvas::Pick() {
 
 	GLuint buff[SELECT_BUFFER_SIZE];
 	GLint hits, view[4];
-	int selected = -1;
+	int lSelected = -1;
 
 	glSelectBuffer(SELECT_BUFFER_SIZE, buff);
 	glGetIntegerv(GL_VIEWPORT, view);
@@ -401,19 +401,19 @@ int PreviewCanvas::Pick() {
 		int i;
 		unsigned int min_depth;
 
-		selected = buff[3] - 1;
+		lSelected = buff[3] - 1;
 		min_depth = buff[1];
 		for (i = 1; i < hits; i++) {
 			if (buff[i * 4 + 1] < min_depth) {
 				min_depth = buff[i * 4 + 1];
-				selected = buff[i * 4 + 3] - 1;
+				lSelected = buff[i * 4 + 3] - 1;
 			}
 		}
 	}
 
 	glDeleteLists(sphere_list, 1);
 
-	return selected;
+	return lSelected;
 
 }
 
@@ -493,9 +493,9 @@ void PreviewCanvas::OnLeftMouseUp(wxMouseEvent& event) {
 	}
 
 	if (!event.ShiftDown() && !was_dragging) {
-		int selected = Pick();
-		if (selected >= 0 && struc->atoms[selected].Type == 1 && struc->FragName.size() <=0) {
-			struc->SetPruneAtom(selected);
+		int lSelected = Pick();
+		if (lSelected >= 0 && struc->atoms[lSelected].Type == 1 && struc->FragName.size() <=0) {
+			struc->SetPruneAtom(lSelected);
 		}
 	}
 
