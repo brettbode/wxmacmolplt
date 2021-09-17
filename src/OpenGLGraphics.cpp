@@ -326,7 +326,7 @@ void MolDisplayWin::DrawGL(int do_shader) {
 	if (haveTransparentSurfaces) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		Surface * lSurface = MainData->cFrame->SurfaceList;
+		lSurface = MainData->cFrame->SurfaceList;
 		if (! transpTriList) {
 			long totalTriCount = 0;
 			while (lSurface) {
@@ -2015,14 +2015,14 @@ long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTrian
 	return result;
 }
 
-void Surf3DBase::CreateWireSurface(CPoint3D * Vertices, CPoint3D * Normals, long * VertexList,
+void Surf3DBase::CreateWireSurface(CPoint3D * Vertices, CPoint3D * Normals, long * cVertexList,
 		long NumTriangles, RGBColor * SurfaceColor, float * SurfaceValue,
 		RGBColor * NColor, float MaxSurfaceValue, MoleculeData * MainData, const WinPrefs * Prefs)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDisable(GL_LIGHTING);
 	glLineWidth(Prefs->GetLineWidth());
-	CreateSolidSurface(Vertices, Normals, VertexList,
+	CreateSolidSurface(Vertices, Normals, cVertexList,
 		NumTriangles, SurfaceColor, SurfaceValue, NColor, MaxSurfaceValue, MainData, NULL);
 	glEnable(GL_LIGHTING);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -2031,7 +2031,7 @@ void Surf3DBase::CreateWireSurface(CPoint3D * Vertices, CPoint3D * Normals, long
 	glLineWidth(1);
 	//This code works only slightly better than the above code on the Intel Macs with ATI hardware.
 	//It seems to miss some lines?
-	CreateWireFrameSurfaceWithLines(Vertices, VertexList,
+	CreateWireFrameSurfaceWithLines(Vertices, cVertexList,
 					   NumTriangles, SurfaceColor, SurfaceValue, NColor, MaxSurfaceValue, MainData);	
 //	glEnable(GL_LIGHTING);
 	*/
@@ -2097,7 +2097,7 @@ long Surf3DBase::CreateSolidSurface(CPoint3D * Vertices, CPoint3D * Normals, lon
 	red = MAX(red, 0.0);
 	blue = MAX(blue, 0.0);
 	green = MAX(green, 0.0);
-	long * VertexList = vList;
+	long * lVertexList = vList;
 	if (isTransparent()) {
 		alpha = (100 - Transparency) / 100.0f;
 		if (!transpTri) return 0;	//transparncy requires a different draw method
@@ -2112,9 +2112,9 @@ long Surf3DBase::CreateSolidSurface(CPoint3D * Vertices, CPoint3D * Normals, lon
 	if (!transpTri)
 		glBegin(GL_TRIANGLES);
 	for (long itri=0; itri<NumTriangles; itri++) {
-		v1 = VertexList[3*itri];
-		v2 = VertexList[3*itri+1];
-		v3 = VertexList[3*itri+2];
+		v1 = lVertexList[3*itri];
+		v2 = lVertexList[3*itri+1];
+		v3 = lVertexList[3*itri+2];
 		
 		if (Normals) {
 			xnorm = Normals[v1].x;
@@ -2230,7 +2230,7 @@ long Surf3DBase::CreateWireFrameSurfaceWithLines(CPoint3D * Vertices, long * vLi
 	red = MAX(red, 0.0);
 	blue = MAX(blue, 0.0);
 	green = MAX(green, 0.0);
-	long * VertexList = vList;
+	long * lVertexList = vList;
 	
 	if (!SurfaceValue) {	//If we are not using surface coloring setup the color once for all the triangles
 		glColor4f(red, green, blue, alpha);
@@ -2239,9 +2239,9 @@ long Surf3DBase::CreateWireFrameSurfaceWithLines(CPoint3D * Vertices, long * vLi
 	glLineWidth(1);
 	glBegin(GL_LINES);
 	for (long itri=0; itri<NumTriangles; itri++) {
-		v1 = VertexList[3*itri];
-		v2 = VertexList[3*itri+1];
-		v3 = VertexList[3*itri+2];
+		v1 = lVertexList[3*itri];
+		v2 = lVertexList[3*itri+1];
+		v3 = lVertexList[3*itri+2];
 		
 		if (SurfaceValue) {
 			float temp = SurfaceValue[v1];
@@ -3159,15 +3159,15 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					if (bonds.size() == 1) {
 						bool test = false;
 						CPoint3D OtherBondVector;
-						for (long i=0; i<NumBonds; i++) {
-							if ((bonded_atoms[0] == lBonds[i].Atom1)&&(lBonds[i].Order > kHydrogenBond)&&
-								(lBonds[i].Atom2 != iatom)) {
-								OtherBondVector = lAtoms[lBonds[i].Atom2].Position - lAtoms[bonded_atoms[0]].Position;
+						for (long ib=0; ib<NumBonds; ib++) {
+							if ((bonded_atoms[0] == lBonds[ib].Atom1)&&(lBonds[ib].Order > kHydrogenBond)&&
+								(lBonds[ib].Atom2 != iatom)) {
+								OtherBondVector = lAtoms[lBonds[ib].Atom2].Position - lAtoms[bonded_atoms[0]].Position;
 								test = true;
 								break;
-							} else if ((bonded_atoms[0] == lBonds[i].Atom2)&&(lBonds[i].Order > kHydrogenBond)&&
-									   (lBonds[i].Atom1 != iatom)) {
-								OtherBondVector = lAtoms[lBonds[i].Atom1].Position - lAtoms[bonded_atoms[0]].Position;
+							} else if ((bonded_atoms[0] == lBonds[ib].Atom2)&&(lBonds[ib].Order > kHydrogenBond)&&
+									   (lBonds[ib].Atom1 != iatom)) {
+								OtherBondVector = lAtoms[lBonds[ib].Atom1].Position - lAtoms[bonded_atoms[0]].Position;
 								test = true;
 								break;
 							}
@@ -3206,30 +3206,30 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				// as the sum of the three, inverted.
 				if (bonds.size() == 3) {
 					//obtain the bond vector by summing the bond vectors, normalize and invert
-					CPoint3D sum(0.0,0.0,0.0), temp, bonds[3];
+					CPoint3D sum(0.0,0.0,0.0), temp, myBonds[3];
 					int found=0;
-					for (int i=0; i<NumBonds; i++) {
-						if (lBonds[i].Atom1 == iatom) {
-							temp = lAtoms[lBonds[i].Atom2].Position - lAtoms[iatom].Position;
+					for (int ib=0; ib<NumBonds; ib++) {
+						if (lBonds[ib].Atom1 == iatom) {
+							temp = lAtoms[lBonds[ib].Atom2].Position - lAtoms[iatom].Position;
 							Normalize3D(&temp);
-							bonds[found] = temp;
+							myBonds[found] = temp;
 							found++;
-						} else if (lBonds[i].Atom2 == iatom) {
-							temp = lAtoms[lBonds[i].Atom1].Position - lAtoms[iatom].Position;
+						} else if (lBonds[ib].Atom2 == iatom) {
+							temp = lAtoms[lBonds[ib].Atom1].Position - lAtoms[iatom].Position;
 							Normalize3D(&temp);
-							bonds[found] = temp;
+							myBonds[found] = temp;
 							found++;
 						}
 					}
-					CrossProduct3D(&(bonds[0]),&(bonds[1]),&sum);
+					CrossProduct3D(&(myBonds[0]),&(myBonds[1]),&sum);
 					Normalize3D(&sum);
-					float direction = DotProduct3D(&sum,&(bonds[2]));
+					float direction = DotProduct3D(&sum,&(myBonds[2]));
 					if (direction > 0.0) direction = -1.0;
 					else direction = 1.0;
-					CrossProduct3D(&(bonds[1]),&(bonds[2]),&temp);
+					CrossProduct3D(&(myBonds[1]),&(myBonds[2]),&temp);
 					Normalize3D(&temp);
 					sum += temp;
-					CrossProduct3D(&(bonds[2]),&(bonds[0]),&temp);
+					CrossProduct3D(&(myBonds[2]),&(myBonds[0]),&temp);
 					Normalize3D(&temp);
 					sum += temp;
 					Normalize3D(&sum);
