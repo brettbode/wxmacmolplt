@@ -3270,13 +3270,13 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					Normalize3D(&offset);
 					Normalize3D(&cross);
 					CPoint3D v3t;
-					float c = cos(0.5*acos(-1.0f/3.0f));	//cos(109.5/2)
-					float s = sqrt(1.0f-(c*c)); //sin(109.5/2)
-					v3t = offset*c + cross*s;
+					float c2 = cos(0.5*acos(-1.0f/3.0f));	//cos(109.5/2)
+					float s2 = sqrt(1.0f-(c2*c2)); //sin(109.5/2)
+					v3t = offset*c2 + cross*s2;
 					Normalize3D(&v3t);
 					DO_SITE(v3t, 3);
 					if (lpCount == 0) {
-						v3t = offset*c - cross*s;
+						v3t = offset*c2 - cross*s2;
 						Normalize3D(&v3t);
 						DO_SITE(v3t, 4);
 					}
@@ -3292,7 +3292,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			// 3 sites while equitorial are 90 degrees from 2 sites and 120 degrees from 2 sites.
 
 			if (bonds.size() == 0) {
-				float c = sqrtf(3) / 2.0f;
+				c = sqrtf(3) / 2.0f;
 				CPoint3D axial(0.0f, 1.0f, 0.0f);
 				CPoint3D equat1(0.0f, 0.0f, -1.0f);
 				CPoint3D equat2(c, 0.0f, 0.5f);
@@ -3493,14 +3493,14 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				float dot_ij;
 				bool is_axial = false;
 				bool is_equatorial;
-				int i, j;
+				int ii, jj;
 
-				for (i = 0; i < 4; i++) {
+				for (ii = 0; ii < 4; ii++) {
 					is_equatorial = false;
-					for (j = 0; j < 4; j++) {
-						if (i == j) continue;
+					for (jj = 0; jj < 4; jj++) {
+						if (ii == jj) continue;
 
-						dot_ij = DotProduct3D(&vecs[i], &vecs[j]);
+						dot_ij = DotProduct3D(&vecs[ii], &vecs[jj]);
 
 						// Vector has an antiparallel mate, so we can't stop
 						// now.
@@ -3522,8 +3522,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 						CPoint3D equat3;
 						int ids[4] = {0, 1, 2, 3};
 						int tmp;
-						tmp = ids[0]; ids[0] = i; ids[i] = tmp;
-						tmp = ids[1]; ids[1] = j; ids[j] = tmp;
+						tmp = ids[0]; ids[0] = ii; ids[ii] = tmp;
+						tmp = ids[1]; ids[1] = jj; ids[jj] = tmp;
 						equat3 = (vecs[ids[2]] + vecs[ids[3]]) * -1.0f;
 						Normalize3D(&equat3);
 						DO_SITE(equat3, 5);
@@ -3726,27 +3726,27 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 			else if (bonds.size() == 4) {
 
-				int i, j;
+				int ii, jj;
 				int nuninverted = 0;
 				int uninverted[2];
 				int ortho1 = -1, ortho2 = -1;
 				bool has_no_inverse;
 
-				for (i = 0; i < 4; i++) {
+				for (ii = 0; ii < 4; ii++) {
 					has_no_inverse = true;
-					for (j = 0; j < 4; j++) {
-						if (i != j) {
-							if (DotProduct3D(&vecs[i], &vecs[j]) < -0.7f) {
+					for (jj = 0; jj < 4; jj++) {
+						if (ii != jj) {
+							if (DotProduct3D(&vecs[ii], &vecs[jj]) < -0.7f) {
 								has_no_inverse = false;
 								break;
 							} else {
-								ortho1 = i;
-								ortho2 = j;
+								ortho1 = ii;
+								ortho2 = jj;
 							}
 						}
 					}
 					if (has_no_inverse) {
-						uninverted[nuninverted] = i;
+						uninverted[nuninverted] = ii;
 						nuninverted++;
 					}
 				}
@@ -3769,25 +3769,25 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 			else if (bonds.size() == 5) {
 
-				int i, j;
+				int ii, jj;
 				bool has_no_inverse;
 
 				// If there isn't an uninverted bond, just go opposite the
 				// primary bond.
 				int uninverted = 0;
 
-				for (i = 0; i < 5; i++) {
+				for (ii = 0; ii < 5; ii++) {
 					has_no_inverse = true;
-					for (j = 0; j < 5; j++) {
-						if (i != j) {
-							if (DotProduct3D(&vecs[i], &vecs[j]) < -0.7f) {
+					for (jj = 0; jj < 5; jj++) {
+						if (ii != jj) {
+							if (DotProduct3D(&vecs[ii], &vecs[jj]) < -0.7f) {
 								has_no_inverse = false;
 								break;
 							}
 						}
 					}
 					if (has_no_inverse) {
-						uninverted = i;
+						uninverted = ii;
 						break;
 					}
 				}
@@ -4170,9 +4170,9 @@ GLuint GetShaderProgram(const std::string& vert_src,
 	glLinkProgram(shader_prog);
 	glGetProgramiv(shader_prog, GL_LINK_STATUS, &succeeded);
 	if (succeeded != GL_TRUE) {
-		char *log;
-		GLint log_length;
-		GLint chars_written;
+//		char *log;
+//		GLint log_length;
+//		GLint chars_written;
 		glGetProgramiv(shader_prog, GL_INFO_LOG_LENGTH, &log_length);
 		if (log_length) {
 			log = new char[log_length];
