@@ -187,17 +187,17 @@ void Surface::Export3DCNS(const float * Grid3D, long /*nx*/, long /*ny*/, long /
  * @param Origin origin of the 3D cartesian grid
  * @param XInc increment vector in the X direction 
  * @param YInc increment vector in the Y direction 
- * @param Label provided text label for this surface
+ * @param cLabel provided text label for this surface
  * @param Buffer A BufferFileObject which the .txt file is buffered into
  * to make parsing the file easier.  See the BufferFile object for valid
  * BufferFile operations.
  */
 void Surface::Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Origin,
-	const CPoint3D *XInc, const CPoint3D *YInc, const char * Label, BufferFile * Buffer) const {
+	const CPoint3D *XInc, const CPoint3D *YInc, const char * cLabel, BufferFile * Buffer) const {
 		char Line[kMaxLineLength];
 	if (!Grid2D) return;
 		//punch out the provided surface label
-	Buffer->WriteLine(Label, true);
+	Buffer->WriteLine(cLabel, true);
 		//Write out the number of grid points in each direction
 	sprintf(Line, "%ld    //# grid points", NumPoints);
 	Buffer->WriteLine(Line, true);	//true means add a line feed
@@ -930,10 +930,10 @@ bool Surf3DBase::AllocateContour(long NumPoints) {
 	if (VertexList) VertexAllocation = 6*NumPoints;
 	return ((ContourHndl != NULL)&&(VertexList != NULL));
 };
-bool Surf3DBase::AllocateContour(long NumVertices, long NumTriangles) {
-	ContourHndl = new CPoint3D[NumVertices];
+bool Surf3DBase::AllocateContour(long cNumVertices, long NumTriangles) {
+	ContourHndl = new CPoint3D[cNumVertices];
 	VertexList = new long[3*NumTriangles];
-	if (ContourHndl) ContourAllocation = NumVertices;
+	if (ContourHndl) ContourAllocation = cNumVertices;
 	if (VertexList) VertexAllocation = 3*NumTriangles;
 	return ((ContourHndl != NULL)&&(VertexList != NULL));
 };
@@ -1532,7 +1532,6 @@ long Surf3DBase::ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals,
 	red = MAX(red, 0.0);
 	blue = MAX(blue, 0.0);
 	green = MAX(green, 0.0);
-	long *VertexList = vList;
 	myGLTriangle *transpTri;
 
 	transpTri = new myGLTriangle[NumTriangles];
@@ -1543,9 +1542,9 @@ long Surf3DBase::ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals,
 	}
 
 	for (long itri = 0; itri < NumTriangles; itri++) {
-		v1 = VertexList[3 * itri];
-		v2 = VertexList[3 * itri + 1];
-		v3 = VertexList[3 * itri + 2];
+		v1 = vList[3 * itri];
+		v2 = vList[3 * itri + 1];
+		v3 = vList[3 * itri + 2];
 		
 		// Triangle 1
 		if (Normals) {

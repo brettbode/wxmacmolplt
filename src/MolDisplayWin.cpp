@@ -3544,16 +3544,16 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 		type = Buffer->GetFileType((const char *) fileName.mb_str(wxConvUTF8));
 		if (type == kUnknown) {
 			Buffer->SetFilePos(0);
-			char test[kMaxLineLength];
-			Buffer->Read(test, sizeof(char) * 20);
-			test[20] = '\0';
-			if (strcmp(test, "BMBm") == 0 || strcmp(test, "mBMB") == 0) {
+			char header[kMaxLineLength];
+			Buffer->Read(header, sizeof(char) * 20);
+			header[20] = '\0';
+			if (strcmp(header, "BMBm") == 0 || strcmp(header, "mBMB") == 0) {
 				if (append) MessageAlert("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
 				else AbortOpen("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
 			} else {
-				if (FindKeyWord(test, "\rtf", 4)>=0) wxLogMessage(_("This file appears to be an RTF file. MacMolPlt requires all text files to be in the plain text format."));
+				if (FindKeyWord(header, "\rtf", 4)>=0) wxLogMessage(_("This file appears to be an RTF file. MacMolPlt requires all text files to be in the plain text format."));
 				//unicode test
-				else if ((test[0]<9)||(test[0] > 126))
+				else if ((header[0]<9)||(header[0] > 126))
 					wxLogMessage(_("This file appears to be a binary or unicode file. MacMolPlt requires all input files to be in the plain text format."));
 				else {
 					SelectFileType lSelector(this);
