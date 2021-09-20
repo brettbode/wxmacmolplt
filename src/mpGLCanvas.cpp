@@ -204,9 +204,7 @@ void MpGLCanvas::SetPrefs(WinPrefs *newPrefs) {
 	Prefs = newPrefs;
 }
 
-wxImage MpGLCanvas::getImage(const int width, const int height) {
-	(void)width;
-	(void)height;
+wxImage MpGLCanvas::getImage(const int /*width*/, const int /*height*/) {
 
 #if wxCHECK_VERSION(2,9,0)
 	SetCurrent(*context);
@@ -261,19 +259,19 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 	glfSetCurrentBMFFont(bitmap_fontd);
 
 	GLint view[4];
-	GLint width,height;
+	GLint lwidth,lheight;
 	
 	glGetIntegerv(GL_VIEWPORT, view);
-	width = view[2];
-	height = view[3];
-	int ScaledWidth = (int) (width * ScaleFactor);
-	int ScaledHeight = (int) (height * ScaleFactor);
-	int NumXPasses = ScaledWidth / width;
-	if ((NumXPasses * width) < ScaledWidth) NumXPasses++;
-	int NumYPasses = ScaledHeight / height;
-	if ((NumYPasses * height) < ScaledHeight) NumYPasses++;
-	int ViewportScaledX = NumXPasses * width;
-	int ViewportScaledY = NumYPasses * height;
+	lwidth = view[2];
+	lheight = view[3];
+	int ScaledWidth = (int) (lwidth * ScaleFactor);
+	int ScaledHeight = (int) (lheight * ScaleFactor);
+	int NumXPasses = ScaledWidth / lwidth;
+	if ((NumXPasses * lwidth) < ScaledWidth) NumXPasses++;
+	int NumYPasses = ScaledHeight / lheight;
+	if ((NumYPasses * lheight) < ScaledHeight) NumYPasses++;
+	int ViewportScaledX = NumXPasses * lwidth;
+	int ViewportScaledY = NumYPasses * lheight;
 
 	long hOffset=0, vOffset=0;
 	if (Center) {   //Compute the offset to move the rect to center on the page
@@ -287,15 +285,15 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 		hOffset = PageCenterH - DCenterH;
 	}
 	
-	/* unsigned char *pixels = (unsigned char *) malloc(3 * width * height *  */
+	/* unsigned char *pixels = (unsigned char *) malloc(3 * lwidth * lheight *  */
 									/* sizeof(GLbyte)); */
-	unsigned char *pixels = new unsigned char[3 * width * height];
+	unsigned char *pixels = new unsigned char[3 * lwidth * lheight];
 	glReadBuffer(GL_BACK);
 	 
 	GLdouble zNear = 0.1;
 	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV()*(kPi)/180.0);
 	GLdouble hGLsize, vGLsize, GLLeft, GLTop;
-	double aspect = ((double)width)/((double)height);
+	double aspect = ((double)lwidth)/((double)lheight);
 	if (aspect > 1.0) {
 		hGLsize = 2.0*(myGLperspective) / ScaleFactor;  //This corresponds to fov=60 with zNear=0.1
 		vGLsize = hGLsize/aspect;
@@ -311,11 +309,11 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 	MolWin->ReleaseLists();
 
 	for (int jpass=0; jpass<NumYPasses; jpass++) {
-		int passheight = height;
-		if ((jpass+1) == NumYPasses) passheight = height - (ViewportScaledY - ScaledHeight);
+		int passheight = lheight;
+		if ((jpass+1) == NumYPasses) passheight = lheight - (ViewportScaledY - ScaledHeight);
 		for (int ipass=0; ipass<NumXPasses; ipass++) {
-			int passwidth = width;
-			if ((ipass+1) == NumXPasses) passwidth = width - (ViewportScaledX - ScaledWidth);
+			int passwidth = lwidth;
+			if ((ipass+1) == NumXPasses) passwidth = lwidth - (ViewportScaledX - ScaledWidth);
 			
 			//Setup the projection matrix to view the correct piece of the view for this pass
 			glMatrixMode(GL_PROJECTION);   //Setup the model space to screen space mapping
@@ -335,18 +333,18 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 			glFinish();
 
 			glReadBuffer(GL_BACK);
-			memset(pixels, 0, 3*width*height*sizeof(GLbyte));
+			memset(pixels, 0, 3*lwidth*lheight*sizeof(GLbyte));
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
-			glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+			glReadPixels(0, 0, lwidth, lheight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
-			wxCoord x = wxCoord(ipass*width + hOffset);
-			wxCoord y = wxCoord(jpass*height + vOffset);
+			wxCoord x = wxCoord(ipass*lwidth + hOffset);
+			wxCoord y = wxCoord(jpass*lheight + vOffset);
 			//I am not sure this is the best way to do this, but it
 			//converts the pixels to a wxImage, flips it vertically to get
 			//it into the right orientation, then converts it to a bitmap
 			//to draw into the device context. We retain ownership of the pixels
 			//and thus have to delete them below.
-			dc->DrawBitmap(wxBitmap(wxImage(width, height, pixels, true).Mirror(false)),
+			dc->DrawBitmap(wxBitmap(wxImage(lwidth, lheight, pixels, true).Mirror(false)),
 							x, y, false);
 			 
 		}
@@ -2325,7 +2323,7 @@ void MpGLCanvas::testPicking(int x, int y) {
 
 }
 
-void MpGLCanvas::SelectObj(int selected_type, long select_id, bool unselect_all) {
+void MpGLCanvas::SelectObj(int cSelected_type, long select_id, bool unselect_all) {
 
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
@@ -2340,7 +2338,7 @@ void MpGLCanvas::SelectObj(int selected_type, long select_id, bool unselect_all)
 	if (select_id >= 0) {
 
 		// select_id indicates an atom
-		if (selected_type == MMP_ATOM) {
+		if (cSelected_type == MMP_ATOM) {
 			bool atom_is_selected = true;
 
 			// If we're to keep other selected items and atom is already
@@ -2388,7 +2386,7 @@ void MpGLCanvas::SelectObj(int selected_type, long select_id, bool unselect_all)
 		}
 		
 		// If select_id indicates a bond
-		else if (selected_type == MMP_BOND) {
+		else if (cSelected_type == MMP_BOND) {
 			bool newstate = true;
 			if (!unselect_all && lBonds[select_id].GetSelectState())
 				newstate = false;
@@ -2754,32 +2752,32 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 					submenu->Append(GL_Popup_To_Aromatic_Bond, wxT("Aromatic"));
 					menu.Append(wxID_ANY, wxT("Add bond"), submenu);
 				} else {
-					wxMenuItem *item;
+					wxMenuItem *lItem;
 					int bond_order = lFrame->Bonds[bond_id].Order;
-					item = submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond,
+					lItem = submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond,
 													wxT("Hydrogen"));
 					if (bond_order == kHydrogenBond) {
-						item->Check(true);
+						lItem->Check(true);
 					}
-					item = submenu->AppendRadioItem(GL_Popup_To_Single_Bond,
+					lItem = submenu->AppendRadioItem(GL_Popup_To_Single_Bond,
 													wxT("Single"));
 					if (bond_order == kSingleBond) {
-						item->Check(true);
+						lItem->Check(true);
 					}
-					item = submenu->AppendRadioItem(GL_Popup_To_Double_Bond,
+					lItem = submenu->AppendRadioItem(GL_Popup_To_Double_Bond,
 													wxT("Double"));
 					if (bond_order == kDoubleBond) {
-						item->Check(true);
+						lItem->Check(true);
 					}
-					item = submenu->AppendRadioItem(GL_Popup_To_Triple_Bond,
+					lItem = submenu->AppendRadioItem(GL_Popup_To_Triple_Bond,
 													wxT("Triple"));
 					if (bond_order == kTripleBond) {
-						item->Check(true);
+						lItem->Check(true);
 					}
-					item = submenu->AppendRadioItem(GL_Popup_To_Aromatic_Bond,
+					lItem = submenu->AppendRadioItem(GL_Popup_To_Aromatic_Bond,
 													wxT("Aromatic"));
 					if (bond_order == kAromaticBond) {
-						item->Check(true);
+						lItem->Check(true);
 					}
 					
 					menu.Append(wxID_ANY, wxT("Change bond"), submenu);
