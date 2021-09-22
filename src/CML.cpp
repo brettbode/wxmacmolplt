@@ -856,12 +856,12 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 			if (i>0) symmetryBuf << " ";
 			symmetryBuf << Symmetry[i];
 		}
-		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
+		XMLElement * symarray = vibElem->addChildElement(CML_convert(ArrayElement),
 													  symmetryBuf.str().c_str());
-		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
-		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Symmetry));
+		symarray->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
+		symarray->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Symmetry));
 		snprintf(countline, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), countline);
+		symarray->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!Intensities.empty()) {
 		std::ostringstream intensitybuf;
@@ -870,12 +870,12 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 			if (i>0) intensitybuf << " ";
 			intensitybuf << Intensities[i];
 		}
-		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
+		XMLElement * intensityArray = vibElem->addChildElement(CML_convert(ArrayElement),
 													 intensitybuf.str().c_str());
-		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
-		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_VibIntensity));
+		intensityArray->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
+		intensityArray->addAttribute(CML_convert(titleAttr), CML_convert(MMP_VibIntensity));
 		snprintf(countline, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), countline);
+		intensityArray->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!ReducedMass.empty()) {
 		std::ostringstream reducedMassbuf;
@@ -884,12 +884,12 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 			if (i>0) reducedMassbuf << " ";
 			reducedMassbuf << ReducedMass[i];
 		}
-		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
+		XMLElement * massArray = vibElem->addChildElement(CML_convert(ArrayElement),
 													 reducedMassbuf.str().c_str());
-		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
-		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_ReducedMass));
+		massArray->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
+		massArray->addAttribute(CML_convert(titleAttr), CML_convert(MMP_ReducedMass));
 		snprintf(countline, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), countline);
+		massArray->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!RamanIntensity.empty()) {
 		std::ostringstream ramanIntensitybuf;
@@ -898,12 +898,12 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 			if (i>0) ramanIntensitybuf << " ";
 			ramanIntensitybuf << RamanIntensity[i];
 		}
-		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
+		XMLElement * ramanArray = vibElem->addChildElement(CML_convert(ArrayElement),
 													 ramanIntensitybuf.str().c_str());
-		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
-		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_RamanIntensity));
+		ramanArray->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
+		ramanArray->addAttribute(CML_convert(titleAttr), CML_convert(MMP_RamanIntensity));
 		snprintf(countline, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), countline);
+		ramanArray->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!Depolarization.empty()) {
 		std::ostringstream depolarizationbuf;
@@ -912,12 +912,12 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 			if (i>0) depolarizationbuf << " ";
 			depolarizationbuf << Depolarization[i];
 		}
-		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
+		XMLElement * depolArray = vibElem->addChildElement(CML_convert(ArrayElement),
 													 depolarizationbuf.str().c_str());
-		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
-		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Depolarization));
+		depolArray->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
+		depolArray->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Depolarization));
 		snprintf(countline, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), countline);
+		depolArray->addAttribute(CML_convert(sizeAttr), countline);
 	}
 }
 void Internals::WriteXML(XMLElement * parent) const {
@@ -1283,9 +1283,9 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 														{
 															XMLElement * frags = mdchild->getFirstChild();
 															while (frags != NULL) {
-																const char * name = frags->getName();
-																if (name) {
-																	if (!strcmp(name, "FRAGNAME")) {
+																const char * fragName = frags->getName();
+																if (fragName) {
+																	if (!strcmp(fragName, "FRAGNAME")) {
 																		FragmentNames.push_back(std::string(frags->getValue()));
 																	}
 																}
@@ -1298,9 +1298,9 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 																XMLElement *frags = mdchild->getFirstChild();
 																const char *fragname;
 																while (frags != NULL) {
-																	const char *name = frags->getName();
-																	if (name) {
-																		if (!strcmp(name, "Fragment")) {
+																	const char *elemName = frags->getName();
+																	if (elemName) {
+																		if (!strcmp(elemName, "Fragment")) {
 																			fragname = frags->getAttributeValue(CML_convert(nameAttr));
 																			efrags.insert(std::pair<std::string, EFrag>(fragname, EFrag(frags->getValue())));
 																		}
@@ -1323,9 +1323,9 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 																if (AnnChild->isName(kAnnotationXML)) {
 																	const char * childtype = AnnChild->getAttributeValue(CML_convert(titleAttr));
 																	if (childtype) {
-																		MMP_AnnotationTypesNS attr;
-																		if (CML_convert(childtype, attr)) {
-																			switch (attr) {
+																		MMP_AnnotationTypesNS annotAttr;
+																		if (CML_convert(childtype, annotAttr)) {
+																			switch (annotAttr) {
 																				case MMP_AnnotationMarker:
 																				{
 																					AnnotationMarker * t = new AnnotationMarker();
@@ -2293,11 +2293,11 @@ BasisSet * BasisSet::ReadXML(XMLElement * parent) {
 										{
 											int nchar, pos=0;
 											const char * val = child->getValue();
-											for (int i=0; i<mlength; i++) {
+											for (int iBS=0; iBS<mlength; iBS++) {
 												long is, ie;
 												if (sscanf(&(val[pos]), "%ld %ld%n", &is, &ie, &nchar) != 2) throw DataError();
-												target->BasisMap[2*i] = is;
-												target->BasisMap[2*i+1] = ie;
+												target->BasisMap[2*iBS] = is;
+												target->BasisMap[2*iBS+1] = ie;
 												pos += nchar;
 											}
 										}
@@ -2306,10 +2306,10 @@ BasisSet * BasisSet::ReadXML(XMLElement * parent) {
 										{
 											int nchar, pos=0;
 											const char * val = child->getValue();
-											for (int i=0; i<mlength; i++) {
+											for (int iNC=0; iNC<mlength; iNC++) {
 												long ic;
 												if (sscanf(&(val[pos]), "%ld%n", &ic, &nchar) != 1) throw DataError();
-												target->NuclearCharge[i] = ic;
+												target->NuclearCharge[iNC] = ic;
 												pos += nchar;
 											}
 											target->goodCharges = true;
@@ -2361,10 +2361,10 @@ void BasisShell::ReadXML(XMLElement * parent) {
 							switch (attr) {
 								case MMP_BSExponent:
 								{
-									float temp;
+									float tempexp;
 									for (int j=0; j<NumPrims; j++) {
-										if (sscanf(&(val[pos]), "%f%n", &temp, &nchar) != 1) throw DataError();
-										Exponent.push_back(temp);
+										if (sscanf(&(val[pos]), "%f%n", &tempexp, &nchar) != 1) throw DataError();
+										Exponent.push_back(tempexp);
 										pos += nchar;
 									}
 								}
@@ -2373,10 +2373,10 @@ void BasisShell::ReadXML(XMLElement * parent) {
 								{
 									int length = NumPrims;
 									if (ShellType < 0) length *= 2;
-									float temp;
+									float tempcoef;
 									for (int j=0; j<length; j++) {
-										if (sscanf(&(val[pos]), "%f%n", &temp, &nchar) != 1) throw DataError();
-										NormCoef.push_back(temp);
+										if (sscanf(&(val[pos]), "%f%n", &tempcoef, &nchar) != 1) throw DataError();
+										NormCoef.push_back(tempcoef);
 										pos += nchar;
 									}
 								}
@@ -2385,10 +2385,10 @@ void BasisShell::ReadXML(XMLElement * parent) {
 								{
 									int length = NumPrims;
 									if (ShellType < 0) length *= 2;
-									float temp;
+									float tempcoef;
 									for (int j=0; j<length; j++) {
-										if (sscanf(&(val[pos]), "%f%n", &temp, &nchar) != 1) throw DataError();
-										InputCoef.push_back(temp);
+										if (sscanf(&(val[pos]), "%f%n", &tempcoef, &nchar) != 1) throw DataError();
+										InputCoef.push_back(tempcoef);
 										pos += nchar;
 									}
 								}
@@ -2851,18 +2851,18 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 											size_t len = strlen(sym);
 											SymType = new char[5*NumAlphaOrbs];
 											long pos = 0;
-											for (long i=0; i<NumAlphaOrbs; i++) {
+											for (long ialpha=0; ialpha<NumAlphaOrbs; ialpha++) {
 												int n=0;
 												while (sym[pos] != ' ') {
-													SymType[n+5*i] = sym[pos];
+													SymType[n+5*ialpha] = sym[pos];
 													pos++;
 													n++;
 													if (pos >= len) {
-														i = NumAlphaOrbs;
+														ialpha = NumAlphaOrbs;
 														break;
 													}
 												}
-												SymType[n+5*i] = '\0';
+												SymType[n+5*ialpha] = '\0';
 												while (sym[pos]==' ') pos++;
 											}
 										}
