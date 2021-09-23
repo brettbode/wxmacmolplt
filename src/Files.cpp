@@ -584,10 +584,9 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			while (ReadStringKeyword(Line, "FRAGNAME", token)) {
 				if (!strcasecmp(token, "H2ORHF") || !strcasecmp(token, "H2ODFT")) {	//builtin EFP1 style is limited to H2O with known labels
 					MainData->FragmentNames.push_back(std::string(token));
-					long fragNum = MainData->FragmentNames.size();
-					CPoint3D	pos;
+					fragNum = MainData->FragmentNames.size();
 					int		AtomType;
-					for (int i=0; i<3; ++i) {
+					for (i=0; i<3; ++i) {
 						AtomType = -1;
 						Buffer->GetLine(Line);
 						//lines have format "label x, y, z"
@@ -596,7 +595,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						if (!strcasecmp(token, "O1")) AtomType = 8;
 						else if (!strcasecmp(token, "H2")||!strcasecmp(token, "H3")) AtomType = 1;
 						if (AtomType > 0) {
-							mpAtom * atm = lFrame->AddAtom(AtomType, pos);
+							atm = lFrame->AddAtom(AtomType, pos);
 							atm->SetFragmentNumber(fragNum);
 						}
 					}
@@ -728,12 +727,12 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					// translate to make the base fragment atom the origin and
 					// then rotate to align the fragment with the destination
 					// plane, and then translate by the base destination atom.
-					for (long i = fstart; i < lFrame->NumAtoms; ++i) {
-						lFrame->GetAtomPosition(i, curr_pos);
+					for (long ii = fstart; ii < lFrame->NumAtoms; ++ii) {
+						lFrame->GetAtomPosition(ii, curr_pos);
 						new_pos = curr_pos - orig;
 						Rotate3DOffset(transform, new_pos, &rot_pos);
 						new_pos = rot_pos + dst_locs[0];
-						lFrame->SetAtomPosition(i, new_pos);
+						lFrame->SetAtomPosition(ii, new_pos);
 					}
 				}
 
@@ -754,19 +753,19 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		Buffer->SetFilePos(0);	//restart search from beginning of file
 		if (Buffer->FindGroup("FMO")) {
 			wxFileOffset startFMO = Buffer->GetFilePos();
-			wxFileOffset EndOfGroup;
+			wxFileOffset FMOEndOfGroup;
 			if (Buffer->LocateKeyWord("$END", 4)) {
-				EndOfGroup = Buffer->GetFilePos();
+				FMOEndOfGroup = Buffer->GetFilePos();
 			} else {
-				EndOfGroup = -1;
+				FMOEndOfGroup = -1;
 				wxLogMessage(_("The FMO group does not have proper termination."));
 			}
 			Buffer->SetFilePos(startFMO);
 			//Parse the items that depend on the # of atoms
 			//The rest of the items in this group depend on the # of atoms so parse them after the coordinates
 			
-			if (Buffer->LocateKeyWord("INDAT", 5, EndOfGroup)) {
-				MainData->ParseFMOIds(Buffer, lFrame->GetNumAtoms(), EndOfGroup);
+			if (Buffer->LocateKeyWord("INDAT", 5, FMOEndOfGroup)) {
+				MainData->ParseFMOIds(Buffer, lFrame->GetNumAtoms(), FMOEndOfGroup);
 			}
 		}
 	}
@@ -813,13 +812,13 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 			char	token[5];
 				//Atom line format:  "%10f%10f%10f %3s"
 		Buffer->GetLine(Line);
-		for (int i=0; i<10; ++i) partA[i] = Line[i];
+		for (int ia=0; ia<10; ++ia) partA[ia] = Line[ia];
 		partA[10] = '\0';
 		scanerr = sscanf(partA, "%10f", &tPt.x);
-		for (int i=0; i<10; ++i) partB[i] = Line[i+10];
+		for (int ib=0; ib<10; ++ib) partB[ib] = Line[ib+10];
 		partB[10] = '\0';
 		scanerr += sscanf(partB, "%10f", &tPt.y);
-		for (int i=0; i<10; ++i) partC[i] = Line[i+20];
+		for (int ic=0; ic<10; ++ic) partC[ic] = Line[ic+20];
 		partC[10] = '\0';
 		scanerr += sscanf(partC, "%10f", &tPt.z);
 		scanerr += sscanf(&(Line[31]), "%3s", token);
@@ -1533,7 +1532,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						bytesRead = 0;
 						for (long imode=0; imode<lineModes; ++imode) {
 							CPoint3D temp;
-							int scanCount = sscanf(&Line[bytesRead], "%f %f %f%n",
+							scanCount = sscanf(&Line[bytesRead], "%f %f %f%n",
 												   &temp.x, &temp.y, &temp.z, &bytesConsumed);
 							if (scanCount == 3) {
 								lFrame->Vibs->NormMode[iatm + lFrame->NumAtoms*(nModes+imode)] = temp;
@@ -2909,10 +2908,10 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 									bool foundPos=false;
 									int lineCount=0;
 									while (!foundPos) {
-										int test;
+										int coretest;
 										Buffer->GetLine(LineText);
-										sscanf(LineText, "%d", &test);
-										if (test == 1) {	//If there are no cores then the first line is needed below.
+										sscanf(LineText, "%d", &coretest);
+										if (coretest == 1) {	//If there are no cores then the first line is needed below.
 											if (NumCoreOrbs<=0) {
 												Buffer->BackupnLines(1);
 											}
@@ -3031,8 +3030,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		} else if (MainData->InputOptions->Control->GetRunType() == IRCRun) {
 			//Confirm that the first energy is before the start of the IRC
 			if (Buffer->LocateKeyWord("JUMPING OFF SADDLE POINT ALONG THE IMAGINARY NORMAL MODE", 55)) {
-				wxFileOffset test = Buffer->GetFilePos();
-				if (EnergyPos > test) {
+				if (EnergyPos > Buffer->GetFilePos()) {
 					return OpenGAMESSIRCLog(Buffer, flip, offset, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
 				}
 			}
@@ -3444,7 +3442,6 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				//could also grab the MM energy here
 				if (Buffer->LocateKeyWord("QM+MM Energy (Hartree):", 23)) {
 					Buffer->GetLine(LineText);
-					double FrameEnergy;
 					sscanf(&(LineText[24]), "%lf", &FrameEnergy);
 					lFrame->Energy = FrameEnergy;
 				}
@@ -3517,45 +3514,45 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 									Occupancy);
 							}
 						}
-						bool test = false;
+						bool testForOrbs = false;
 						if (MainData->InputOptions->Control->GetCIType() == 4) {
 							//CIS output includes the EIGENVECTORS token
 							//I think the regular EIGENVECTORS would be before the CIS line???
 							wxFileOffset bp = Buffer->GetFilePos();
-							test = Buffer->LocateKeyWord("EIGENVECTORS", 12, NextFinalPos);
+							testForOrbs = Buffer->LocateKeyWord("EIGENVECTORS", 12, NextFinalPos);
 							Buffer->BackupnLines(1);
 							if (Buffer->LocateKeyWord("CIS EIGENVALUES", 14, 80+Buffer->GetFilePos())) {
 								Buffer->SkipnLines(1);
-								test = Buffer->LocateKeyWord("EIGENVECTORS", 12, NextFinalPos);
-								if (!test) {
+								testForOrbs = Buffer->LocateKeyWord("EIGENVECTORS", 12, NextFinalPos);
+								if (!testForOrbs) {
 									Buffer->SetFilePos(bp);
-									test = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
+									testForOrbs = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
 									Buffer->BackupnLines(1);
 									if (Buffer->LocateKeyWord("# MOLECULAR ORBITALS =", 22)) {
 										Buffer->SkipnLines(1);
-										test = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
-										if (!test) Buffer->SetFilePos(bp);
+										testForOrbs = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
+										if (!testForOrbs) Buffer->SetFilePos(bp);
 									}
 								}
 							}
 						} else {
-							test = Buffer->LocateKeyWord("EIGENVECTORS", 12, NextFinalPos);
-							if (!test) {
-								test = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
+							testForOrbs = Buffer->LocateKeyWord("EIGENVECTORS", 12, NextFinalPos);
+							if (!testForOrbs) {
+								testForOrbs = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
 								//for a while GAMESS printed out MOLECULAR ORBITALS with the LZ analysis
 								//so add a test to avoid that output
-								if (test) {
+								if (testForOrbs) {
 									Buffer->BackupnLines(0);
 									Buffer->GetLine(LineText);
 									LinePos = FindKeyWord(LineText, "LZ VALUE ANALYSIS", 16);
 									if (LinePos > -1) {
 										Buffer->SkipnLines(2);
-										test = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
+										testForOrbs = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
 									}
 								}
 							}
 						}
-						if (test) {
+						if (testForOrbs) {
 								//skip over the line to the start of the orbital blocks
 								//There is always a blank line before the orbs, but there may a '---' divider line after the key line just found
 							if ((NextFinalPos<0)||(NextFinalPos>Buffer->GetFilePos())) {
@@ -4202,7 +4199,7 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 	long nSkip = 0;
 	
 	ProgressInd->ChangeText("Reading GAMESS trajectory file...");
-	Frame * lFrame = MainData->cFrame;
+	Frame * lFrame2 = MainData->cFrame;
 	
 	long NumAIAtoms=0, NumFragments=0, NumMDAtoms=0;
 	//Determine the specific run type
@@ -4264,7 +4261,7 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 			if (pos >= 0) {
 				sscanf(&(LineText[pos+8]), "%ld", &point);
 			}
-			lFrame->IRCPt = point * flip;
+			lFrame2->IRCPt = point * flip;
 		} else
 			Buffer->SkipnLines(1);
 		//search for the end of the packet?
@@ -4391,10 +4388,9 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 						while (ReadStringKeyword(LineText, "FRAGNAME", token)) {
 							if (!strcasecmp(token, "H2ORHF") || !strcasecmp(token, "H2ODFT")) {	//builtin EFP1 style is limited to H2O with known labels
 								MainData->FragmentNames.push_back(std::string(token));
-								long fragNum = MainData->FragmentNames.size();
-								CPoint3D	pos;
+								fragNum = MainData->FragmentNames.size();
 								int		AtomType;
-								for (int i=0; i<3; ++i) {
+								for (i=0; i<3; ++i) {
 									AtomType = -1;
 									Buffer->GetLine(LineText);
 									//lines have format "label x, y, z"
@@ -4404,7 +4400,7 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 									if (!strcasecmp(&(token[c]), "O1")) AtomType = 8;
 									else if (!strcasecmp(&(token[c]), "H2")||!strcasecmp(&(token[c]), "H3")) AtomType = 1;
 									if (AtomType > 0) {
-										mpAtom * atm = lFrame->AddAtom(AtomType, pos);
+										atm = lFrame->AddAtom(AtomType, pos);
 										atm->SetFragmentNumber(fragNum);
 									}
 								}
@@ -4509,12 +4505,12 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 								// translate to make the base fragment atom the origin and
 								// then rotate to align the fragment with the destination
 								// plane, and then translate by the base destination atom.
-								for (long i = fstart; i < lFrame->NumAtoms; ++i) {
-									lFrame->GetAtomPosition(i, curr_pos);
+								for (long ifrag = fstart; ifrag < lFrame->NumAtoms; ++ifrag) {
+									lFrame->GetAtomPosition(ifrag, curr_pos);
 									new_pos = curr_pos - orig;
 									Rotate3DOffset(transform, new_pos, &rot_pos);
 									new_pos = rot_pos + dst_locs[0];
-									lFrame->SetAtomPosition(i, new_pos);
+									lFrame->SetAtomPosition(ifrag, new_pos);
 								}
 							}
 							fragmentsfound++;
