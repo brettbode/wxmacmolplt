@@ -85,7 +85,7 @@ void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
   * @param XInc increment in the X direction 
   * @param YInc increment in the Y direction 
   * @param ZInc increment in the Z direction 
-  * @param Label provided text label for this surface
+  * @param inLabel provided text label for this surface
   * @param Buffer A BufferFileObject which the .txt file is buffered into
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
