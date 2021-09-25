@@ -732,7 +732,7 @@ void wxMolGraph::draw(wxDC &dc, bool toScreen) {
     }
 
     // Data
-    dc.SetClippingRegion(graphRegion);
+    dc.SetDeviceClippingRegion(graphRegion);
     try {
         for(i = 0; i < data.size(); i++) {
             for(j = 0; j < data[i].second.size(); j++) {
