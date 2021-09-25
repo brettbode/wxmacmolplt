@@ -2187,8 +2187,8 @@ void MolDisplayWin::ShowToolbar(bool enable) {
 
 //		std::cout << "lasso w="<< enabled_bmp.GetWidth() << " h="<<enabled_bmp.GetHeight()<<std::endl;
 		enabled_bmp = wxBitmap(rect_lasso_xpm);
-		enabled_bmp.SetWidth(16);
-		enabled_bmp.SetHeight(15);
+//		enabled_bmp.SetWidth(16);
+//		enabled_bmp.SetHeight(15);
 		toolbar->AddRadioTool(MMP_TOOL_LASSO, _("Select"), enabled_bmp,
 			wxNullBitmap);
 
