@@ -1739,6 +1739,10 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 			lFrame->SetEnergy(temp);
 		}
 	}
+	if (lFrame->PreviousFrame)
+		lFrame->time = lFrame->PreviousFrame->time + 1;
+	else
+		lFrame->time = 0;
 	long DRCnSkip = Prefs->GetDRCSkip(), nSkip=0;
 		bool Done=false;
 		bool RdPoint = true;
@@ -1802,6 +1806,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 						RdPoint = true;
 						lFrame = MainData->AddFrame(nAtoms,0);
 						if (!lFrame) throw MemoryError();
+						lFrame->time = lFrame->PreviousFrame->time + 1;
 						Buffer->GetLine(Line);
 						//Attempt to parse an energy from the title line, first as the first part of the line
 						c = sscanf(Line,"%lf", &temp);
