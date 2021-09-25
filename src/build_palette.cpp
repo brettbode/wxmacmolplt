@@ -444,7 +444,7 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 	// All button images are generated dynamically.  So, we need a font and an
 	// offscreen renderer.
 	mem_dc = new wxMemoryDC();
-	font = new wxFont(font_size, wxSWISS, wxFONTSTYLE_NORMAL,
+	font = new wxFont(font_size, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL,
 		wxFONTWEIGHT_NORMAL, false, wxT(""), wxFONTENCODING_SYSTEM);
 	mem_dc->SetFont(*font);
 
