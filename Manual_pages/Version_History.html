@@ -13,6 +13,19 @@ current release before reporting it.</P>
 <P>
 <HR WIDTH="80%">
 </P><BR>
+<P>Version 7.7.2:</P>
+<UL>
+	<LI>Corrected bug in the computation of shell screen for 3D orbital computations.
+	<LI>Corrected the use of energy units in the energy plot window.
+	<LI>Corrected a bug resulting in non-editable fields when adding atoms in Z-matrix mode in the Coordinates Window.
+	<LI>Corrected bug effecting the export of a series of GAMESS input groups that caused the first frame to be replicated and the last geometry to be missing.
+	<LI>Added support for dark mode. This requires wx 3.1.3 or later (which is currently Mac only). This fixes
+        view problems in the surfaces, frequency and energy plot windows. Frequency and energy plots use dark mode on the screen but always copy/export in light mode. The main display copies as is currently displayed. If you do not want the dark background in the main display set the background color to not quite white as the code will only flip to dark if the background is fully white.
+	<LI>Added parser for raman intensities from TDHFX output. Previously raman frequencies were only
+        parsed from RAMAN runtyp runs.
+	<LI>Added option to parse an energy value from the label line for XMol XYZ files and added the ability to append XYZ files. Documented in the <a href="MacMolPlt_Files.html">Files manual page</a>. Note also documented existing option for MolDen format files.
+	<LI>Upgraded Windows build to use wxWidgets 3.1.5 which seems to have cured a scaling issue on Windows systems with high pixel density displays without actual code changes.
+</UL>
 <P>Version 7.7.1:</P>
 <UL>
 	<LI>Corrected builder bug in rotation around bond.
