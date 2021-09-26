@@ -479,7 +479,6 @@
 		8BED377A09EDCC0E0003DF64 /* setscreenplane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setscreenplane.h; path = src/setscreenplane.h; sourceTree = "<group>"; };
 		8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setbondlength.cpp; path = src/setbondlength.cpp; sourceTree = "<group>"; };
 		8BEDF9FF0A09390700BF6F85 /* setbondlength.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setbondlength.h; path = src/setbondlength.h; sourceTree = "<group>"; };
-		8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		8BF17D760A5328210059B71F /* windowparameters.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = windowparameters.cpp; path = src/windowparameters.cpp; sourceTree = "<group>"; };
 		8BF17D770A5328210059B71F /* windowparameters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = windowparameters.h; path = src/windowparameters.h; sourceTree = "<group>"; };
 		8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = zmatrixcalculator.cpp; path = src/zmatrixcalculator.cpp; sourceTree = "<group>"; };
@@ -605,7 +604,6 @@
 				8B932BC60D0A45F900DACA21 /* solvents.cml */,
 				8B9B485A0D0F3CF000CE0EDF /* organics.cml */,
 				8B9B48520D0F37BD00CE0EDF /* amino_acids.cml */,
-				8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */,
 				8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */,
 				8B45D25D0A700DB60005269A /* arial1.glf */,
 				8B6716370C44015B0067A3C9 /* arial1.bmf */,
@@ -1353,7 +1351,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1458,7 +1456,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
 				CODE_SIGN_ENTITLEMENTS = wxMacMolPltRelease.entitlements;
@@ -1481,6 +1479,7 @@
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = NO;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
