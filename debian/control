@@ -2,7 +2,10 @@ Source: wxmacmolplt
 Section: science
 Priority: optional
 Maintainer: Brett Bode <MMP.Guy@gmail.com>
-Build-Depends: debhelper (>= 5), autotools-dev, libwxgtk3.0-dev (>= 3.0.0), wx3.0-headers (>= 3.0.0), libpng12-dev, libgl1-mesa-dev | libgl-dev, libglu1-mesa-dev | libglu-dev
+# The following works for Debian Jesse and stretch
+#Build-Depends: debhelper (>= 5), autotools-dev, libwxgtk3.0-dev (>= 3.0.0), wx3.0-headers (>= 3.0.0), libpng12-dev, libgl1-mesa-dev | libgl-dev, libglu1-mesa-dev | libglu-dev
+# For Debian buster and bullseye the package names are slightly different.
+Build-Depends: debhelper (>= 5), autotools-dev, libwxgtk3.0-gtk3-dev (>= 3.0.0), wx3.0-headers (>= 3.0.0), libpng-dev, libgl1-mesa-dev | libgl-dev, libglu1-mesa-dev | libglu-dev
 Standards-Version: 3.7.2
 
 Package: wxmacmolplt
