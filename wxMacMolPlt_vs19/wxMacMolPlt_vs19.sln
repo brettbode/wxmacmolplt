@@ -13,6 +13,10 @@ Global
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
+		wx 3.1 Release|x64 = wx 3.1 Release|x64
+		wx 3.1 Release|x86 = wx 3.1 Release|x86
+		wx3.1 Debug|x64 = wx3.1 Debug|x64
+		wx3.1 Debug|x86 = wx3.1 Debug|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.Debug|x64.ActiveCfg = Debug|x64
@@ -23,6 +27,14 @@ Global
 		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.Release|x64.Build.0 = Release|x64
 		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.Release|x86.ActiveCfg = Release|Win32
 		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.Release|x86.Build.0 = Release|Win32
+		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.wx 3.1 Release|x64.ActiveCfg = wx 3.1 Release|x64
+		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.wx 3.1 Release|x64.Build.0 = wx 3.1 Release|x64
+		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.wx 3.1 Release|x86.ActiveCfg = wx 3.1 Release|Win32
+		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.wx 3.1 Release|x86.Build.0 = wx 3.1 Release|Win32
+		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.wx3.1 Debug|x64.ActiveCfg = wx3.1 Debug|x64
+		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.wx3.1 Debug|x64.Build.0 = wx3.1 Debug|x64
+		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.wx3.1 Debug|x86.ActiveCfg = wx3.1 Debug|Win32
+		{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}.wx3.1 Debug|x86.Build.0 = wx3.1 Debug|Win32
 		{5971B610-86BB-42C0-82A9-9238F320BE40}.Debug|x64.ActiveCfg = Debug
 		{5971B610-86BB-42C0-82A9-9238F320BE40}.Debug|x64.Build.0 = Debug
 		{5971B610-86BB-42C0-82A9-9238F320BE40}.Debug|x86.ActiveCfg = Debug
@@ -31,6 +43,14 @@ Global
 		{5971B610-86BB-42C0-82A9-9238F320BE40}.Release|x64.Build.0 = Release
 		{5971B610-86BB-42C0-82A9-9238F320BE40}.Release|x86.ActiveCfg = Release
 		{5971B610-86BB-42C0-82A9-9238F320BE40}.Release|x86.Build.0 = Release
+		{5971B610-86BB-42C0-82A9-9238F320BE40}.wx 3.1 Release|x64.ActiveCfg = Release
+		{5971B610-86BB-42C0-82A9-9238F320BE40}.wx 3.1 Release|x64.Build.0 = Release
+		{5971B610-86BB-42C0-82A9-9238F320BE40}.wx 3.1 Release|x86.ActiveCfg = Release
+		{5971B610-86BB-42C0-82A9-9238F320BE40}.wx 3.1 Release|x86.Build.0 = Release
+		{5971B610-86BB-42C0-82A9-9238F320BE40}.wx3.1 Debug|x64.ActiveCfg = Debug
+		{5971B610-86BB-42C0-82A9-9238F320BE40}.wx3.1 Debug|x64.Build.0 = Debug
+		{5971B610-86BB-42C0-82A9-9238F320BE40}.wx3.1 Debug|x86.ActiveCfg = Debug
+		{5971B610-86BB-42C0-82A9-9238F320BE40}.wx3.1 Debug|x86.Build.0 = Debug
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
