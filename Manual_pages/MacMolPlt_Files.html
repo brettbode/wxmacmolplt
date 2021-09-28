@@ -358,7 +358,8 @@ on <A HREF="http://en.wikipedia.org/wiki/MDL_Molfile">MDL's file format</A>.</P>
 			<HR WIDTH="70%">
 		</H4>
 		<h4><a name="molden"></a>MolDen format files</h4>
-		<p>MolDen format files are a loosely doucmented text file format supported by several applications. MacMolPlt should be able to read most information, including orbitals and multiple geometries. Note that STO type basis sets are not supported.</p>
+		<p>MolDen format files are a loosely doucmented text file format supported by several applications. MacMolPlt should be able to read most information, including orbitals and multiple geometries. Note that STO type basis sets are not supported.
+ If the label line (between the line with the atom count and the first atom) contains "done:" the following text will be parsed as a floating point energy.</p>
 		<h4><a name="mkl"></a>Molekel MKL files</h4>
 		<p>A parser for Molekel MKL (.mkl) files. Included are coordinates, basis set and orbitals.</p>
 		<h4>
@@ -371,7 +372,7 @@ structures and can have multiple frames. The basic format is:</P>
 
 <P>1st line MUST contain the number of atoms<BR>
 
-1 line label<BR>
+1 line label, If this line begins with numeric text that can be parsed as a floating point number it will be assigned as the energy for the frame. Alternatively MacMolPlt will look for the output from VB2000 which is of the form "REACTOR RUN - POINT NUMBER 01    Energy =     -75.00340268". From that MacMolPlt is only looking for "Energy = #" and ignores the rest of the text.<BR>
 
 One line for each atom given in the format:<BR>
 
