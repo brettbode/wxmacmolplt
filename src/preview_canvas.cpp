@@ -169,6 +169,9 @@ void PreviewCanvas::Render() {
 	
 	int width, height;
 	GetClientSize(&width, &height);
+	double scaleContent = GetContentScaleFactor();
+	width *= scaleContent;
+	height *= scaleContent;
 	glViewport(0, 0, width, height);
 		
 	glMatrixMode(GL_PROJECTION);
@@ -343,6 +346,9 @@ void PreviewCanvas::OnLeftMouseDown(wxMouseEvent& event) {
 	GetClientSize(&width, &height);
 	
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 	prev_mouse = curr_mouse;
 	was_dragging = false;
 
@@ -375,6 +381,9 @@ int PreviewCanvas::Pick() {
 
 	int width, height;
 	GetClientSize(&width, &height);
+	double scaleContent = GetContentScaleFactor();
+	width *= scaleContent;
+	height *= scaleContent;
 
 	// Set narrow window around mouse point.
 	glMatrixMode(GL_PROJECTION);
@@ -422,6 +431,9 @@ int PreviewCanvas::Pick() {
 void PreviewCanvas::OnMiddleMouseDown(wxMouseEvent& event) {
 
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 	prev_mouse = curr_mouse;
 	was_dragging = false;
 
@@ -443,6 +455,11 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
+	width *= scaleContent;
+	height *= scaleContent;
 
 	was_dragging = true;
 
@@ -508,6 +525,9 @@ void PreviewCanvas::OnLeftMouseUp(wxMouseEvent& event) {
 void PreviewCanvas::OnMouseEnterWindow(wxMouseEvent& event) {
 
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 	prev_mouse = curr_mouse;
 
 }
