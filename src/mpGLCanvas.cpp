@@ -531,7 +531,11 @@ void MpGLCanvas::eventSize(wxSizeEvent &event) {
 #else
 	(void) event;
 #endif
+	double scaleContent = GetContentScaleFactor();
+	double scaleDPI = GetDPIScaleFactor();
 	GetClientSize(&width, &height);
+	width *= scaleContent;
+	height *= scaleContent;
 	Update();
 	Refresh();
 
@@ -1109,6 +1113,9 @@ void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 
 	// If we're in edit mode, we display the periodic table dialog.
 	if (MolWin->InEditMode() && selected_type == MMP_NULL &&
@@ -1129,6 +1136,9 @@ void MpGLCanvas::eventWindowActivated(wxActivateEvent& event) {
 void MpGLCanvas::eventMouseEnterWindow(wxMouseEvent& event) {
 
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 	prev_mouse = curr_mouse;
 
 }
@@ -1154,6 +1164,9 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 	ignore_next_up = false;
 
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 	prev_mouse = curr_mouse;
 
 	ndrag_events = 0;
@@ -1214,6 +1227,10 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 	ndrag_events = 0;
 
 	curr_mouse = event.GetPosition();
+	wxPoint unscaledMouse = curr_mouse;
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 	prev_mouse = curr_mouse;
 
 	testPicking(curr_mouse.x, curr_mouse.y);
@@ -1232,25 +1249,25 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 		}
 
 		if (MolWin->InEditMode()) {
-			interactPopupMenu(curr_mouse.x, curr_mouse.y, 1);
+			interactPopupMenu(unscaledMouse.x, unscaledMouse.y, 1);
 		} else {
-			measurePopupMenu(curr_mouse.x, curr_mouse.y);
+			measurePopupMenu(unscaledMouse.x, unscaledMouse.y);
 		}
 	}
 
 	else if (selected_type == MMP_BOND) {
 		if (MolWin->InEditMode()) {
-			interactPopupMenu(curr_mouse.x, curr_mouse.y, 0);
+			interactPopupMenu(unscaledMouse.x, unscaledMouse.y, 0);
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->ReleaseLists();
 			MolWin->Dirtify();
 		} else {
-			bondPopupMenu(curr_mouse.x, curr_mouse.y);
+			bondPopupMenu(unscaledMouse.x, unscaledMouse.y);
 		}
 	}
 
 	else if (selected_type == MMP_ANNOTATION) {
-		annoPopupMenu(curr_mouse.x, curr_mouse.y);
+		annoPopupMenu(unscaledMouse.x, unscaledMouse.y);
 	}
 
 	else {
@@ -1275,6 +1292,9 @@ void MpGLCanvas::eventMouseMiddleWentDown(wxMouseEvent& event) {
 #endif
 
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 	prev_mouse = curr_mouse;
 
 	testPicking(curr_mouse.x, curr_mouse.y);
@@ -1305,6 +1325,9 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 
 	// We only show text if a button isn't held down.
 	if (!event.Dragging()) {
@@ -1421,6 +1444,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	Frame *lFrame = mMainData->cFrame;
 
 	curr_mouse = event.GetPosition();
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 	prev_mouse = curr_mouse;
 	was_zooming = false;
 
@@ -1774,6 +1800,10 @@ void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+	wxPoint unscaledMouse = curr_mouse;
+	double scaleContent = GetContentScaleFactor();
+	curr_mouse.x *= scaleContent;
+	curr_mouse.y *= scaleContent;
 
 	if (HasCapture()) {
 		ReleaseMouse();
@@ -1785,7 +1815,7 @@ void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 		glfSetCurrentBMFFont(bitmap_fontd);
 		MolWin->Rotate(event);
 	} else if (MolWin->InEditMode()) {
-		ShowBlankPopup(curr_mouse.x, curr_mouse.y);
+		ShowBlankPopup(unscaledMouse.x, unscaledMouse.y);
 	}
 
 }
