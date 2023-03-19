@@ -377,6 +377,9 @@ void MolDisplayWin::DrawGL(int do_shader) {
 		glLoadIdentity();
 
 		glCanvas->GetClientSize(&canvas_width, &canvas_height);
+		double scaleContent = GetContentScaleFactor();
+		canvas_width *= scaleContent;
+		canvas_height *= scaleContent;
 		gluOrtho2D(0, canvas_width, 0, canvas_height);
 
 		glColor4f(0.5f, 0.5f, 0.5f, 0.4f);
