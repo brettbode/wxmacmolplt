@@ -155,8 +155,7 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 	EVT_BUTTON( ID_DEFAULTSBUTTON, InputBuilderWindow::OnDefaultsbuttonClick )
 	EVT_BUTTON( ID_REVERTBUTTON, InputBuilderWindow::OnRevertbuttonClick )
 	EVT_BUTTON( ID_WRITEFILEBUTTON, InputBuilderWindow::OnWritefilebuttonClick )
-        EVT_BUTTON( ID_WRITE_EDIT_BUTTON, InputBuilderWindow::OnWriteEditButtonClick )
-
+	EVT_BUTTON( ID_WRITE_EDIT_BUTTON, InputBuilderWindow::OnWriteEditButtonClick )
 	EVT_BUTTON( ID_ADVANCEDBUTTON, InputBuilderWindow::OnAdvancedButtonClicked )
 	EVT_BUTTON( wxID_CANCEL, InputBuilderWindow::OnCancelClick )
 	EVT_BUTTON( wxID_OK, InputBuilderWindow::OnOkClick )
@@ -648,7 +647,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText41 = new wxStaticText( itemPanel27, wxID_STATIC, _("Molecule Charge:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer40->Add(itemStaticText41, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5);
 
-	mchargeText = new wxTextCtrl( itemPanel27, ID_MCHARGE_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mchargeText = new wxTextCtrl( itemPanel27, ID_MCHARGE_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxSize(50, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mchargeText->SetToolTip(_("$CONTRL:ICHARG - Enter an integer value for the molecular charge."));
 	itemFlexGridSizer40->Add(mchargeText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
@@ -656,7 +655,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText43 = new wxStaticText( itemPanel27, wxID_STATIC, _("Multiplicity:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer40->Add(itemStaticText43, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-	multText = new wxTextCtrl( itemPanel27, ID_MULT_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	multText = new wxTextCtrl( itemPanel27, ID_MULT_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxSize(50, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		multText->SetToolTip(_("$CONTRL:MULT - Enter an integer value for the spin state."));
 	itemFlexGridSizer40->Add(multText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -681,7 +680,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText49 = new wxStaticText( itemPanel27, wxID_STATIC, _("Max # SCF Iterations:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer46->Add(itemStaticText49, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-	scfIterText = new wxTextCtrl( itemPanel27, ID_MAXIT_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	scfIterText = new wxTextCtrl( itemPanel27, ID_MAXIT_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxSize(50, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		scfIterText->SetToolTip(_("$CONTRL:MAXIT - Enter the maximum number of SCF iterations. If the wavefunction is not converged at this point the run will be aborted."));
 	itemFlexGridSizer46->Add(scfIterText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -789,7 +788,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText70 = new wxStaticText( itemPanel59, wxID_STATIC, _("# of Z-Matrix Variables:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer69->Add(itemStaticText70, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-	zmatrixVarsText = new wxTextCtrl( itemPanel59, ID_ZMAT_VARS_TEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	zmatrixVarsText = new wxTextCtrl( itemPanel59, ID_ZMAT_VARS_TEXT, wxEmptyString, wxDefaultPosition, wxSize(100,-1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		zmatrixVarsText->SetToolTip(_("$CONTRL:NZVAR - Enter an integer number representing the number of internal coordinates for your molecule. Normally this will be 3N-6 (3N-5 for linear molecules) where N is the number of atoms. A value of 0 selects cartesian coordinates. If set and a set of internal coordinates are defined a $ZMAT group will be punched out."));
 	itemBoxSizer69->Add(zmatrixVarsText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -856,7 +855,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText82 = new wxStaticText( itemPanel79, wxID_STATIC, _("Time Limit:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer81->Add(itemStaticText82, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5);
 
-	timeLimitText = new wxTextCtrl( itemPanel79, ID_TIMELIMIT_TEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	timeLimitText = new wxTextCtrl( itemPanel79, ID_TIMELIMIT_TEXT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (InputBuilderWindow::ShowToolTips())
 		timeLimitText->SetToolTip(_("$SYSTEM:TIMLIM - Enter a value for the time limit. When the time limit is reached GAMESS will stop the run. The number entered here will have the units given at the right."));
 	itemFlexGridSizer81->Add(timeLimitText, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -876,7 +875,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText85 = new wxStaticText( itemPanel79, wxID_STATIC, _("Memory:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer81->Add(itemStaticText85, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-	memoryText = new wxTextCtrl( itemPanel79, ID_MEMORY_TEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	memoryText = new wxTextCtrl( itemPanel79, ID_MEMORY_TEXT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (InputBuilderWindow::ShowToolTips())
 		memoryText->SetToolTip(_("$SYSTEM:MEMORY - Enter the amount of memory (in the units at the right) that GAMESS will request for its dynamic memory pool. You should not normally request more memory than the RAM size."));
 	itemFlexGridSizer81->Add(memoryText, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -893,7 +892,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText88 = new wxStaticText( itemPanel79, wxID_STATIC, _("MemDDI:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer81->Add(itemStaticText88, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	memddiText = new wxTextCtrl( itemPanel79, ID_MEMDDI_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	memddiText = new wxTextCtrl( itemPanel79, ID_MEMDDI_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (InputBuilderWindow::ShowToolTips())
 		memddiText->SetToolTip(_("$SYSTEM:MEMDDI - The size of the pseudo global shared memory pool. This is most often needed for certain parallel computations, but certain sequential algorithms also use it (such as ROMP2). Default is 0."));
 	itemFlexGridSizer81->Add(memddiText, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -957,7 +956,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText101 = new wxStaticText( itemPanel98, wxID_STATIC, _("Number of Closed Shell Orbitals:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer100->Add(itemStaticText101, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mGVB_NCOEdit = new wxTextCtrl( itemPanel98, ID_GVB_NCOEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mGVB_NCOEdit = new wxTextCtrl( itemPanel98, ID_GVB_NCOEDIT, wxEmptyString, wxDefaultPosition, wxSize(60, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mGVB_NCOEdit->SetToolTip(_("$SCF:NCO You almost certainly need to change this from the default!"));
 	itemFlexGridSizer100->Add(mGVB_NCOEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -965,7 +964,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText103 = new wxStaticText( itemPanel98, wxID_STATIC, _("Number of Geminal Pairs:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer100->Add(itemStaticText103, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mGVB_PairsEdit = new wxTextCtrl( itemPanel98, ID_GVB_PAIRSEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mGVB_PairsEdit = new wxTextCtrl( itemPanel98, ID_GVB_PAIRSEDIT, wxEmptyString, wxDefaultPosition, wxSize(60, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mGVB_PairsEdit->SetToolTip(_("$SCF:NPAIR"));
 	itemFlexGridSizer100->Add(mGVB_PairsEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -973,7 +972,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText105 = new wxStaticText( itemPanel98, wxID_STATIC, _("Number of Sets of Open Shells:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer100->Add(itemStaticText105, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mGVB_NSETOEdit = new wxTextCtrl( itemPanel98, ID_GVB_NSETOEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mGVB_NSETOEdit = new wxTextCtrl( itemPanel98, ID_GVB_NSETOEDIT, wxEmptyString, wxDefaultPosition, wxSize(60, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mGVB_NSETOEdit->SetToolTip(_("$SCF:NSETO"));
 	itemFlexGridSizer100->Add(mGVB_NSETOEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -981,7 +980,7 @@ void InputBuilderWindow::CreateControls()
 	mGVB_NOStatic = new wxStaticText( itemPanel98, wxID_STATIC, _("Degeneracy of Each Open Shell:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer100->Add(mGVB_NOStatic, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mGVB_NOEdit = new wxTextCtrl( itemPanel98, ID_GVB_NOEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mGVB_NOEdit = new wxTextCtrl( itemPanel98, ID_GVB_NOEDIT, wxEmptyString, wxDefaultPosition, wxSize(60, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mGVB_NOEdit->SetToolTip(_("$SCF:NO - A space-delimited array providing the degeneracy of each open shell. There must be the number of values specified directly above."));
 	itemFlexGridSizer100->Add(mGVB_NOEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1008,7 +1007,7 @@ void InputBuilderWindow::CreateControls()
 	itemFlexGridSizer111->Add(itemStaticText114, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
 	funcSizer = new wxBoxSizer(wxVERTICAL);
-	itemFlexGridSizer111->Add(funcSizer, 1, wxGROW|wxGROW, 5);
+	itemFlexGridSizer111->Add(funcSizer, 1, wxGROW, 5);
 	wxArrayString dftGridFuncChoiceStrings;
 	dftGridFuncChoiceStrings.Add(_("Slater exchange"));
 	dftGridFuncChoiceStrings.Add(_("Becke 1988 exchange"));
@@ -1128,7 +1127,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText122 = new wxStaticText( itemPanel118, wxID_STATIC, _("Number of FMO fragments:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer121->Add(itemStaticText122, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mNumFragsEdit = new wxTextCtrl( itemPanel118, ID_FMOFRAGCOUNT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mNumFragsEdit = new wxTextCtrl( itemPanel118, ID_FMOFRAGCOUNT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer121->Add(mNumFragsEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	mFMOFragList = new wxGrid( itemPanel118, ID_FMOLIST, wxDefaultPosition, wxSize(220, 150), wxSUNKEN_BORDER|wxVSCROLL|wxALWAYS_SHOW_SB );
@@ -1179,7 +1178,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText135 = new wxStaticText( itemPanel126, wxID_STATIC, _("Number of Orbitals to read in:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer134->Add(itemStaticText135, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mVecOrbCountText = new wxTextCtrl( itemPanel126, ID_MOGUESS_VECORBCOUNT_TEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mVecOrbCountText = new wxTextCtrl( itemPanel126, ID_MOGUESS_VECORBCOUNT_TEXT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mVecOrbCountText->SetToolTip(_("$GUESS:NORB - Enter an integer number of orbitals to read in from the $VEC group. The default is to read in the number of occupied orbitals for RHF, UHF, ROHF, and GVB, but you must provide a value for CI and MCSCF runs."));
 	itemBoxSizer134->Add(mVecOrbCountText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1219,7 +1218,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText144 = new wxStaticText( itemPanel139, wxID_STATIC, _("Displacement size (bohrs):"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer143->Add(itemStaticText144, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-	mHESSDisplaceEdit = new wxTextCtrl( itemPanel139, ID_FORCEDISPLACE_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mHESSDisplaceEdit = new wxTextCtrl( itemPanel139, ID_FORCEDISPLACE_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mHESSDisplaceEdit->SetToolTip(_("$FORCE:VIBSIZ Enter a value (in Bohrs) for the size of the displacement for numerical hessians. (default is 0.01)"));
 	itemBoxSizer143->Add(mHESSDisplaceEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1253,7 +1252,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText151 = new wxStaticText( itemPanel139, wxID_STATIC, _("Frequency scale factor:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer150->Add(itemStaticText151, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-	mHessFreqScaleEdit = new wxTextCtrl( itemPanel139, ID_HESSFREQSCALE_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mHessFreqScaleEdit = new wxTextCtrl( itemPanel139, ID_HESSFREQSCALE_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mHessFreqScaleEdit->SetToolTip(_("$FORCE:SCLFAC Enter a floating point value representing the frequency scaling factor to use for the thermochemical analysis. (unscaled frequencies are always printed)."));
 	itemBoxSizer150->Add(mHessFreqScaleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1312,7 +1311,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText165 = new wxStaticText( itemPanel162, wxID_STATIC, _("# of core electrons:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer164->Add(itemStaticText165, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5);
 
-	mMP2CoreEleEdit = new wxTextCtrl( itemPanel162, ID_MP2_CORE_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mMP2CoreEleEdit = new wxTextCtrl( itemPanel162, ID_MP2_CORE_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mMP2CoreEleEdit->SetToolTip(_("$MP2:NACORE - Enter an integer value for the number of electrons to leave out of the MP2 calculation."));
 	itemFlexGridSizer164->Add(mMP2CoreEleEdit, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
@@ -1320,7 +1319,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText167 = new wxStaticText( itemPanel162, wxID_STATIC, _("Memory (in words):"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer164->Add(itemStaticText167, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5);
 
-	mMP2MemEdit = new wxTextCtrl( itemPanel162, ID_MP2MEM_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mMP2MemEdit = new wxTextCtrl( itemPanel162, ID_MP2MEM_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mMP2MemEdit->SetToolTip(_("$MP2:NWORD - Enter an integer number for the number of words of memory to use in the MP2 calculation. A value of 0 uses all available memory."));
 	itemFlexGridSizer164->Add(mMP2MemEdit, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
@@ -1328,7 +1327,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText169 = new wxStaticText( itemPanel162, wxID_STATIC, _("Integral retention cutoff:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer164->Add(itemStaticText169, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-	mMP2IntCutoffEdit = new wxTextCtrl( itemPanel162, ID_MP2INTCUTOFF_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mMP2IntCutoffEdit = new wxTextCtrl( itemPanel162, ID_MP2INTCUTOFF_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	mMP2IntCutoffEdit->SetHelpText(_("$MP2:CUTOFF - Enter a floating point value for the integral retention cutoff. (default is 1.0e-9)"));
 	if (InputBuilderWindow::ShowToolTips())
 		mMP2IntCutoffEdit->SetToolTip(_("$MP2:CUTOFF - Enter a floating point value for the integral retention cutoff. (default is 1.0e-9)"));
@@ -1409,7 +1408,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText186 = new wxStaticText( itemPanel183, wxID_STATIC, _("Max. number of steps:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer185->Add(itemStaticText186, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5);
 
-	mMaxStepCountEdit = new wxTextCtrl( itemPanel183, ID_MAXSTEPCOUNT_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mMaxStepCountEdit = new wxTextCtrl( itemPanel183, ID_MAXSTEPCOUNT_EDIT, wxEmptyString, wxDefaultPosition, wxSize(60, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mMaxStepCountEdit->SetToolTip(_("$STATPT:NSTEP=An integer representing the maximum number of steps to take before cleanly stopping the run (after punching out all needed restart data). Most such runs can be restarted."));
 	itemFlexGridSizer185->Add(mMaxStepCountEdit, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
@@ -1417,7 +1416,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText188 = new wxStaticText( itemPanel183, wxID_STATIC, _("Gradient convergance criteria:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer185->Add(itemStaticText188, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-	mGradConvEdit = new wxTextCtrl( itemPanel183, ID_GRADCONVCRITERIA_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mGradConvEdit = new wxTextCtrl( itemPanel183, ID_GRADCONVCRITERIA_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mGradConvEdit->SetToolTip(_("$STATPT:OPTTOL=a floating point value representing the convergance criteria for the gradient (in Hartree/Bohr)."));
 	itemFlexGridSizer185->Add(mGradConvEdit, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1445,7 +1444,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText195 = new wxStaticText( itemPanel183, wxID_STATIC, _("Initial step size:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer194->Add(itemStaticText195, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5);
 
-	mInitStepSizeEdit = new wxTextCtrl( itemPanel183, ID_INITSTEPSIZE_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mInitStepSizeEdit = new wxTextCtrl( itemPanel183, ID_INITSTEPSIZE_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mInitStepSizeEdit->SetToolTip(_("$STATPT:DXMAX = a floating point value representing the initial size of the step"));
 	itemFlexGridSizer194->Add(mInitStepSizeEdit, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
@@ -1453,7 +1452,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText197 = new wxStaticText( itemPanel183, wxID_STATIC, _("Min. step size:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer194->Add(itemStaticText197, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP, 5);
 
-	mMinStepSizeEdit = new wxTextCtrl( itemPanel183, ID_MINSTEPSIZE_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mMinStepSizeEdit = new wxTextCtrl( itemPanel183, ID_MINSTEPSIZE_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mMinStepSizeEdit->SetToolTip(_("$STATPT:TRMIN= the minimum size of the step."));
 	itemFlexGridSizer194->Add(mMinStepSizeEdit, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
@@ -1461,7 +1460,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText199 = new wxStaticText( itemPanel183, wxID_STATIC, _("Max. step size:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer194->Add(itemStaticText199, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-	mMaxStepSizeEdit = new wxTextCtrl( itemPanel183, ID_MAXSTEPSIZE_CHECK, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mMaxStepSizeEdit = new wxTextCtrl( itemPanel183, ID_MAXSTEPSIZE_CHECK, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mMaxStepSizeEdit->SetToolTip(_("$STATPT:TRMAX= the maximum size of the step."));
 	itemFlexGridSizer194->Add(mMaxStepSizeEdit, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1485,7 +1484,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText205 = new wxStaticText( itemPanel183, wxID_STATIC, _("Jump Size:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer204->Add(itemStaticText205, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mStatPtJumpSizeEdit = new wxTextCtrl( itemPanel183, ID_STATPT_JUMP_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mStatPtJumpSizeEdit = new wxTextCtrl( itemPanel183, ID_STATPT_JUMP_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mStatPtJumpSizeEdit->SetToolTip(_("$STATPT:STSTEP= the size of the step taken away from stationary points.\n"));
 	itemBoxSizer204->Add(mStatPtJumpSizeEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1509,7 +1508,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText211 = new wxStaticText( itemPanel183, wxID_STATIC, _("Recalc. Hess every"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer210->Add(itemStaticText211, 0, wxALIGN_TOP|wxLEFT|wxTOP|wxBOTTOM, 10);
 
-	mHessRecalcEdit = new wxTextCtrl( itemPanel183, ID_HESS_RECALC_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mHessRecalcEdit = new wxTextCtrl( itemPanel183, ID_HESS_RECALC_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mHessRecalcEdit->SetToolTip(_("$STATPT:IHREP=an integer representing how often the hessian will be fully recalculated. A value of zero is normal and means never fully recalculate the hessian. The hessian will be updated at every step."));
 	itemBoxSizer210->Add(mHessRecalcEdit, 0, wxALIGN_TOP|wxALL, 5);
@@ -1522,7 +1521,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText215 = new wxStaticText( itemPanel183, wxID_STATIC, _("Follow which mode?"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer214->Add(itemStaticText215, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mStatPtModeEdit = new wxTextCtrl( itemPanel183, ID_STATPT_MODE_EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+	mStatPtModeEdit = new wxTextCtrl( itemPanel183, ID_STATPT_MODE_EDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (InputBuilderWindow::ShowToolTips())
 		mStatPtModeEdit->SetToolTip(_("$STATPT:IFOLOW Only applicable to SADPOINT runs and indicates which mode to maximize."));
 	itemBoxSizer214->Add(mStatPtModeEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1568,7 +1567,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText228 = new wxStaticText( itemPanel219, wxID_STATIC, _("SCF Type:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer227->Add(itemStaticText228, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mSCFTypeText = new wxTextCtrl( itemPanel219, ID_SUMMARY_SCFTYPE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mSCFTypeText = new wxTextCtrl( itemPanel219, ID_SUMMARY_SCFTYPE, wxEmptyString, wxDefaultPosition, wxSize(200, -1), 0 );
 	mSCFTypeText->Enable(false);
 	itemBoxSizer227->Add(mSCFTypeText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -1577,7 +1576,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText231 = new wxStaticText( itemPanel219, wxID_STATIC, _("Run Type:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer230->Add(itemStaticText231, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mRunTypeText = new wxTextCtrl( itemPanel219, ID_SUMMARY_RUNTYPE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mRunTypeText = new wxTextCtrl( itemPanel219, ID_SUMMARY_RUNTYPE, wxEmptyString, wxDefaultPosition, wxSize(200, -1), 0 );
 	mRunTypeText->Enable(false);
 	itemBoxSizer230->Add(mRunTypeText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -1586,7 +1585,7 @@ void InputBuilderWindow::CreateControls()
 	wxStaticText* itemStaticText234 = new wxStaticText( itemPanel219, wxID_STATIC, _("Molecular Point Group:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer233->Add(itemStaticText234, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mPointGroupText = new wxTextCtrl( itemPanel219, ID_SUMMARY_PG, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mPointGroupText = new wxTextCtrl( itemPanel219, ID_SUMMARY_PG, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	mPointGroupText->Enable(false);
 	itemBoxSizer233->Add(mPointGroupText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
