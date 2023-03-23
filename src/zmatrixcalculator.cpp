@@ -134,7 +134,7 @@ void ZMatrixCalculator::CreateControls()
 	wxStaticText* itemStaticText4 = new wxStaticText( itemPanel3, wxID_STATIC, _("Primary Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer3->Add(itemStaticText4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mAtom1Edit = new wxTextCtrl( itemPanel3, ID_ATOM1EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mAtom1Edit = new wxTextCtrl( itemPanel3, ID_ATOM1EDIT, wxEmptyString, wxDefaultPosition, wxSize(60,-1), 0 );
 	if (ZMatrixCalculator::ShowToolTips())
 		mAtom1Edit->SetToolTip(_("Enter the index of the atom you want to define."));
 	itemBoxSizer3->Add(mAtom1Edit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -148,7 +148,7 @@ void ZMatrixCalculator::CreateControls()
 	wxStaticText* itemStaticText8 = new wxStaticText( itemPanel3, wxID_STATIC, _("Second Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer7->Add(itemStaticText8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mAtom2Edit = new wxTextCtrl( itemPanel3, ID_ATOM2EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mAtom2Edit = new wxTextCtrl( itemPanel3, ID_ATOM2EDIT, wxEmptyString, wxDefaultPosition, wxSize(60,-1), 0 );
 	if (ZMatrixCalculator::ShowToolTips())
 		mAtom2Edit->SetToolTip(_("Enter the index of the atom defining the bond."));
 	itemBoxSizer7->Add(mAtom2Edit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -159,7 +159,7 @@ void ZMatrixCalculator::CreateControls()
 	wxStaticText* itemStaticText11 = new wxStaticText( itemPanel3, wxID_STATIC, _("Third Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mAtom3Edit = new wxTextCtrl( itemPanel3, ID_ATOM3EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mAtom3Edit = new wxTextCtrl( itemPanel3, ID_ATOM3EDIT, wxEmptyString, wxDefaultPosition, wxSize(60,-1), 0 );
 	if (ZMatrixCalculator::ShowToolTips())
 		mAtom3Edit->SetToolTip(_("Enter the index of the atom defining the bond angle with atom 2 and 1."));
 	itemBoxSizer10->Add(mAtom3Edit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -170,7 +170,7 @@ void ZMatrixCalculator::CreateControls()
 	wxStaticText* itemStaticText14 = new wxStaticText( itemPanel3, wxID_STATIC, _("Fourth Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer13->Add(itemStaticText14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mAtom4Edit = new wxTextCtrl( itemPanel3, ID_ATOM4EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mAtom4Edit = new wxTextCtrl( itemPanel3, ID_ATOM4EDIT, wxEmptyString, wxDefaultPosition, wxSize(60,-1), 0 );
 	if (ZMatrixCalculator::ShowToolTips())
 		mAtom4Edit->SetToolTip(_("Enter the atom index defining the dihedral angle with atoms 3-2-1."));
 	itemBoxSizer13->Add(mAtom4Edit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -187,7 +187,7 @@ void ZMatrixCalculator::CreateControls()
 	wxStaticText* itemStaticText19 = new wxStaticText( itemPanel3, wxID_STATIC, _("Bond Length:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer18->Add(itemStaticText19, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mBondLength = new wxTextCtrl( itemPanel3, ID_BONDLENGTHEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	mBondLength = new wxTextCtrl( itemPanel3, ID_BONDLENGTHEDIT, wxEmptyString, wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
 	itemBoxSizer18->Add(mBondLength, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxHORIZONTAL);
@@ -196,7 +196,7 @@ void ZMatrixCalculator::CreateControls()
 	wxStaticText* itemStaticText22 = new wxStaticText( itemPanel3, wxID_STATIC, _("Bond Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer21->Add(itemStaticText22, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mBondAngle = new wxTextCtrl( itemPanel3, ID_BONDANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	mBondAngle = new wxTextCtrl( itemPanel3, ID_BONDANGLEEDIT, wxEmptyString, wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
 	itemBoxSizer21->Add(mBondAngle, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer24 = new wxBoxSizer(wxHORIZONTAL);
@@ -205,7 +205,7 @@ void ZMatrixCalculator::CreateControls()
 	wxStaticText* itemStaticText25 = new wxStaticText( itemPanel3, wxID_STATIC, _("Dihedral Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer24->Add(itemStaticText25, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mDihedralAngle = new wxTextCtrl( itemPanel3, ID_DIHEDRALANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	mDihedralAngle = new wxTextCtrl( itemPanel3, ID_DIHEDRALANGLEEDIT, wxEmptyString, wxDefaultPosition, wxSize(80,-1), wxTE_READONLY );
 	itemBoxSizer24->Add(mDihedralAngle, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	// Set validators
