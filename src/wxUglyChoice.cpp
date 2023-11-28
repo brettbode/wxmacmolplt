@@ -26,7 +26,7 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
 
     m_txt = new wxTextCtrl(this,
                            wxID_ANY,
-                           wxT(""),
+                           wxT("000000"),
                            wxDefaultPosition,
                            wxDefaultSize,
                            wxTE_READONLY);
@@ -78,7 +78,7 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
 	
     m_txt = new wxTextCtrl(this,
                            wxID_ANY,
-                           wxT(""),
+                           wxT("000000"),
                            wxDefaultPosition,
                            wxDefaultSize,
                            wxTE_READONLY);
