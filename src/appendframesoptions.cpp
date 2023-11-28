@@ -116,7 +116,7 @@ void AppendFramesOptions::CreateControls()
 	wxStaticText* itemStaticText6 = new wxStaticText( itemDialog1, wxID_STATIC, _("IRC or time coordinate offset:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer5->Add(itemStaticText6, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	offsetEdit = new wxTextCtrl( itemDialog1, ID_OFFSETTEXTCTL, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	offsetEdit = new wxTextCtrl( itemDialog1, ID_OFFSETTEXTCTL, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (AppendFramesOptions::ShowToolTips())
 		offsetEdit->SetToolTip(_("This value will be added to the IRC or DRP time to determine the order frames will be inserted."));
 	itemBoxSizer5->Add(offsetEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -127,7 +127,7 @@ void AppendFramesOptions::CreateControls()
 	wxStaticText* itemStaticText9 = new wxStaticText( itemDialog1, wxID_STATIC, _("# of points to skip between\npoints read in:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	itemBoxSizer8->Add(itemStaticText9, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	skipEdit = new wxTextCtrl( itemDialog1, ID_SKIPTEXTCTL, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	skipEdit = new wxTextCtrl( itemDialog1, ID_SKIPTEXTCTL, wxEmptyString, wxDefaultPosition, wxSize(60, -1), 0 );
 	if (AppendFramesOptions::ShowToolTips())
 		skipEdit->SetToolTip(_("Enter 0 to read every geometry, 1 to read every other geometry, ..."));
 	itemBoxSizer8->Add(skipEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);

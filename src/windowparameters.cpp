@@ -125,10 +125,10 @@ void windowparameters::CreateControls()
 	wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer4->Add(itemBoxSizer6, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mXWinSize = new wxTextCtrl( itemDialog1, ID_XWINSIZEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mXWinSize = new wxTextCtrl( itemDialog1, ID_XWINSIZEEDIT, wxEmptyString, wxDefaultPosition, wxSize(60, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer6->Add(mXWinSize, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mYWinSize = new wxTextCtrl( itemDialog1, ID_YWINSIZE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mYWinSize = new wxTextCtrl( itemDialog1, ID_YWINSIZE, wxEmptyString, wxDefaultPosition, wxSize(60, -1), 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer6->Add(mYWinSize, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxArrayString mUnitRadiosStrings;
@@ -147,7 +147,7 @@ void windowparameters::CreateControls()
 	wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Window Scale:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mWindowScale = new wxTextCtrl( itemDialog1, ID_WINSCALE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mWindowScale = new wxTextCtrl( itemDialog1, ID_WINSCALE, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	itemBoxSizer10->Add(mWindowScale, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("Window Center:"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -156,13 +156,13 @@ void windowparameters::CreateControls()
 	wxBoxSizer* itemBoxSizer14 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mXWinCenter = new wxTextCtrl( itemDialog1, ID_XWINCENTER, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mXWinCenter = new wxTextCtrl( itemDialog1, ID_XWINCENTER, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	itemBoxSizer14->Add(mXWinCenter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mYWinCenter = new wxTextCtrl( itemDialog1, ID_YWINCENTER, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mYWinCenter = new wxTextCtrl( itemDialog1, ID_YWINCENTER, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	itemBoxSizer14->Add(mYWinCenter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mZWinCenter = new wxTextCtrl( itemDialog1, ID_ZWINCENTER, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mZWinCenter = new wxTextCtrl( itemDialog1, ID_ZWINCENTER, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	itemBoxSizer14->Add(mZWinCenter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText18 = new wxStaticText( itemDialog1, wxID_STATIC, _("Rotation Angles (degrees):"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -171,13 +171,13 @@ void windowparameters::CreateControls()
 	wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer19, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mPsiEdit = new wxTextCtrl( itemDialog1, ID_PSIANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mPsiEdit = new wxTextCtrl( itemDialog1, ID_PSIANGLEEDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	itemBoxSizer19->Add(mPsiEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mPhiEdit = new wxTextCtrl( itemDialog1, ID_PHIANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mPhiEdit = new wxTextCtrl( itemDialog1, ID_PHIANGLEEDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	itemBoxSizer19->Add(mPhiEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mThetaEdit = new wxTextCtrl( itemDialog1, ID_THETAANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mThetaEdit = new wxTextCtrl( itemDialog1, ID_THETAANGLEEDIT, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	itemBoxSizer19->Add(mThetaEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer23 = new wxBoxSizer(wxHORIZONTAL);

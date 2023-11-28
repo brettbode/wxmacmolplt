@@ -137,7 +137,7 @@ void CoordinateOffset::CreateControls()
 		slider->SetToolTip(_("Adjust the slider to adjust the magnitude of the offset"));
 	itemBoxSizer4->Add(slider, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	editField = new wxTextCtrl( itemDialog1, ID_TEXTCTRL1, _("0.0"), wxDefaultPosition, wxDefaultSize, 0 );
+	editField = new wxTextCtrl( itemDialog1, ID_TEXTCTRL1, _("0.0"), wxDefaultPosition, wxSize(60, -1), 0 );
 	if (CoordinateOffset::ShowToolTips())
 		editField->SetToolTip(_("Type in a specific value for the offset percentage"));
 	itemBoxSizer4->Add(editField, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
