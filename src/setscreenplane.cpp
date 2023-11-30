@@ -170,17 +170,17 @@ void SetScreenPlane::CreateControls()
 	wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 1"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer4->Add(itemStaticText7, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	Pt1XCtl = new wxTextCtrl( itemDialog1, ID_PT1X, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Pt1XCtl = new wxTextCtrl( itemDialog1, ID_PT1X, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
 		Pt1XCtl->SetToolTip(_("The x-coordinate for point 1."));
 	itemFlexGridSizer4->Add(Pt1XCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	Pt1YCtl = new wxTextCtrl( itemDialog1, ID_PT1Y, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Pt1YCtl = new wxTextCtrl( itemDialog1, ID_PT1Y, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
 		Pt1YCtl->SetToolTip(_("The y-coordinate for point 1."));
 	itemFlexGridSizer4->Add(Pt1YCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	Pt1ZCtl = new wxTextCtrl( itemDialog1, ID_PT1Z, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Pt1ZCtl = new wxTextCtrl( itemDialog1, ID_PT1Z, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
 		Pt1ZCtl->SetToolTip(_("The z-coordinate for point 1."));
 	itemFlexGridSizer4->Add(Pt1ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -196,17 +196,17 @@ void SetScreenPlane::CreateControls()
 	wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 2"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer4->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	Pt2XCtl = new wxTextCtrl( itemDialog1, ID_PT2X, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Pt2XCtl = new wxTextCtrl( itemDialog1, ID_PT2X, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
 		Pt2XCtl->SetToolTip(_("The x-coordinate for point 2."));
 	itemFlexGridSizer4->Add(Pt2XCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	Pt2YCtl = new wxTextCtrl( itemDialog1, ID_PT2Y, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Pt2YCtl = new wxTextCtrl( itemDialog1, ID_PT2Y, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
 		Pt2YCtl->SetToolTip(_("The y-coordinate for point 2."));
 	itemFlexGridSizer4->Add(Pt2YCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	Pt2ZCtl = new wxTextCtrl( itemDialog1, ID_PT2Z, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Pt2ZCtl = new wxTextCtrl( itemDialog1, ID_PT2Z, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
 		Pt2ZCtl->SetToolTip(_("The z-coordinate for point 2."));
 	itemFlexGridSizer4->Add(Pt2ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -222,17 +222,17 @@ void SetScreenPlane::CreateControls()
 	wxStaticText* itemStaticText19 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 3"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemFlexGridSizer4->Add(itemStaticText19, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	Pt3XCtl = new wxTextCtrl( itemDialog1, ID_PT3X, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Pt3XCtl = new wxTextCtrl( itemDialog1, ID_PT3X, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
 		Pt3XCtl->SetToolTip(_("The x-coordinate for point 3."));
 	itemFlexGridSizer4->Add(Pt3XCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	Pt3YCtl = new wxTextCtrl( itemDialog1, ID_PT3Y, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Pt3YCtl = new wxTextCtrl( itemDialog1, ID_PT3Y, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
 		Pt3YCtl->SetToolTip(_("The y-coordinate for point 3."));
 	itemFlexGridSizer4->Add(Pt3YCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	Pt3ZCtl = new wxTextCtrl( itemDialog1, ID_PT3Z, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Pt3ZCtl = new wxTextCtrl( itemDialog1, ID_PT3Z, wxEmptyString, wxDefaultPosition, wxSize(100, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
 		Pt3ZCtl->SetToolTip(_("The z-coordinate for point 3."));
 	itemFlexGridSizer4->Add(Pt3ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
