@@ -24,6 +24,89 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		8B0CFB5229A79188000C4F4C /* bindoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC809D0B43700B7783F /* bindoc.icns */; };
+		8B0CFB5329A79188000C4F4C /* MacMolPlt.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACA09D0B43700B7783F /* MacMolPlt.icns */; };
+		8B0CFB5429A79188000C4F4C /* prefs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACB09D0B43700B7783F /* prefs.icns */; };
+		8B0CFB5529A79188000C4F4C /* text-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACC09D0B43700B7783F /* text-doc.icns */; };
+		8B0CFB5629A79188000C4F4C /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
+		8B0CFB5729A79188000C4F4C /* arial1.glf in Resources */ = {isa = PBXBuildFile; fileRef = 8B45D25D0A700DB60005269A /* arial1.glf */; };
+		8B0CFB5829A79188000C4F4C /* arial1.bmf in Resources */ = {isa = PBXBuildFile; fileRef = 8B6716370C44015B0067A3C9 /* arial1.bmf */; };
+		8B0CFB5929A79188000C4F4C /* BsVeraSans.fdb in Resources */ = {isa = PBXBuildFile; fileRef = 8B396EAA0C764DB7009690AF /* BsVeraSans.fdb */; };
+		8B0CFB5A29A79188000C4F4C /* amino_acids.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B9B48520D0F37BD00CE0EDF /* amino_acids.cml */; };
+		8B0CFB5B29A79188000C4F4C /* organics.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B9B485A0D0F3CF000CE0EDF /* organics.cml */; };
+		8B0CFB5C29A79188000C4F4C /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B932BC60D0A45F900DACA21 /* solvents.cml */; };
+		8B0CFB5D29A79188000C4F4C /* view.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B38BDEF19A0549100AACA09 /* view.png */; };
+		8B0CFB5E29A79188000C4F4C /* perpixel_dirlight_f.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66680E030FAB000EC27D /* perpixel_dirlight_f.glsl */; };
+		8B0CFB5F29A79188000C4F4C /* perpixel_dirlight_v.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66690E030FAB000EC27D /* perpixel_dirlight_v.glsl */; };
+		8B0CFB6029A79188000C4F4C /* splash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 8B54E5261798CCDB008A0558 /* splash.jpg */; };
+		8B0CFB6229A79188000C4F4C /* AtomTypeList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2709D0B12600B7783F /* AtomTypeList.cpp */; };
+		8B0CFB6329A79188000C4F4C /* BasisSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2909D0B12600B7783F /* BasisSet.cpp */; };
+		8B0CFB6429A79188000C4F4C /* BFiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2B09D0B12600B7783F /* BFiles.cpp */; };
+		8B0CFB6529A79188000C4F4C /* CML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2E09D0B12600B7783F /* CML.cpp */; };
+		8B0CFB6629A79188000C4F4C /* DataClasses.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3009D0B12600B7783F /* DataClasses.cpp */; };
+		8B0CFB6729A79188000C4F4C /* Files.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3109D0B12600B7783F /* Files.cpp */; };
+		8B0CFB6829A79188000C4F4C /* Frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3209D0B12600B7783F /* Frame.cpp */; };
+		8B0CFB6929A79188000C4F4C /* GaussHermite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3409D0B12600B7783F /* GaussHermite.cpp */; };
+		8B0CFB6A29A79188000C4F4C /* Gradient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3909D0B12600B7783F /* Gradient.cpp */; };
+		8B0CFB6B29A79188000C4F4C /* InputData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3B09D0B12600B7783F /* InputData.cpp */; };
+		8B0CFB6C29A79188000C4F4C /* Internals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3D09D0B12600B7783F /* Internals.cpp */; };
+		8B0CFB6D29A79188000C4F4C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3F09D0B12600B7783F /* main.cpp */; };
+		8B0CFB6E29A79188000C4F4C /* Math3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4109D0B12600B7783F /* Math3D.cpp */; };
+		8B0CFB6F29A79188000C4F4C /* MEP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4309D0B12600B7783F /* MEP.cpp */; };
+		8B0CFB7029A79188000C4F4C /* MMPPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4409D0B12600B7783F /* MMPPrefs.cpp */; };
+		8B0CFB7129A79188000C4F4C /* MoleculeData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4609D0B12600B7783F /* MoleculeData.cpp */; };
+		8B0CFB7229A79188000C4F4C /* mpGLCanvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */; };
+		8B0CFB7329A79188000C4F4C /* orbitals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4E09D0B12600B7783F /* orbitals.cpp */; };
+		8B0CFB7429A79188000C4F4C /* Progress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5009D0B12600B7783F /* Progress.cpp */; };
+		8B0CFB7529A79188000C4F4C /* RysPolynomial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5209D0B12600B7783F /* RysPolynomial.cpp */; };
+		8B0CFB7629A79188000C4F4C /* SurfaceBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5409D0B12600B7783F /* SurfaceBase.cpp */; };
+		8B0CFB7729A79188000C4F4C /* SurfWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5609D0B12600B7783F /* SurfWin.cpp */; };
+		8B0CFB7829A79188000C4F4C /* VirtualSphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5709D0B12600B7783F /* VirtualSphere.cpp */; };
+		8B0CFB7929A79188000C4F4C /* wxFiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5909D0B12600B7783F /* wxFiles.cpp */; };
+		8B0CFB7A29A79188000C4F4C /* XML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5A09D0B12600B7783F /* XML.cpp */; };
+		8B0CFB7B29A79188000C4F4C /* MolDisplayWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */; };
+		8B0CFB7C29A79188000C4F4C /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
+		8B0CFB7D29A79188000C4F4C /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
+		8B0CFB7E29A79188000C4F4C /* bondsdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16FB432E09F026A300E84C6B /* bondsdlg.cpp */; };
+		8B0CFB7F29A79188000C4F4C /* coordinateswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */; };
+		8B0CFB8029A79188000C4F4C /* llmdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1626378A0A07E46E0089452E /* llmdialog.cpp */; };
+		8B0CFB8129A79188000C4F4C /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
+		8B0CFB8229A79188000C4F4C /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
+		8B0CFB8329A79188000C4F4C /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
+		8B0CFB8429A79188000C4F4C /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
+		8B0CFB8529A79188000C4F4C /* aboutwxmacmolplt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */; };
+		8B0CFB8629A79188000C4F4C /* energyplotdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */; };
+		8B0CFB8729A79188000C4F4C /* wxMolGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */; };
+		8B0CFB8829A79188000C4F4C /* choosevecgroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */; };
+		8B0CFB8929A79188000C4F4C /* coordinateoffset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */; };
+		8B0CFB8A29A79188000C4F4C /* frameenergy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA3EF0A2BE373009DFD94 /* frameenergy.cpp */; };
+		8B0CFB8B29A79188000C4F4C /* setPreference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4730A2E189B009DFD94 /* setPreference.cpp */; };
+		8B0CFB8C29A79188000C4F4C /* frequenciesdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA47F0A2E6A17009DFD94 /* frequenciesdialog.cpp */; };
+		8B0CFB8D29A79188000C4F4C /* inputfileeditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BCFA4911D85ACF50009BBCD /* inputfileeditor.cpp */; };
+		8B0CFB8E29A79188000C4F4C /* myPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */; };
+		8B0CFB8F29A79188000C4F4C /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
+		8B0CFB9029A79188000C4F4C /* colorArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF50A4B6F0D00994DD5 /* colorArea.cpp */; };
+		8B0CFB9129A79188000C4F4C /* inputbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */; };
+		8B0CFB9229A79188000C4F4C /* surfaceDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */; };
+		8B0CFB9329A79188000C4F4C /* wxUglyChoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */; };
+		8B0CFB9429A79188000C4F4C /* windowparameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17D760A5328210059B71F /* windowparameters.cpp */; };
+		8B0CFB9529A79188000C4F4C /* zmatrixcalculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */; };
+		8B0CFB9629A79188000C4F4C /* glf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B899C0A6EAD7E0041EA88 /* glf.cpp */; };
+		8B0CFB9729A79188000C4F4C /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
+		8B0CFB9829A79188000C4F4C /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
+		8B0CFB9929A79188000C4F4C /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
+		8B0CFB9A29A79188000C4F4C /* selectfiletype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B8C741D7CDBB3007C1E15 /* selectfiletype.cpp */; };
+		8B0CFB9B29A79188000C4F4C /* swfexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */; };
+		8B0CFB9C29A79188000C4F4C /* Geometries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */; };
+		8B0CFB9D29A79188000C4F4C /* ChooseDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */; };
+		8B0CFB9E29A79188000C4F4C /* MyTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6716510C4BF1290067A3C9 /* MyTypes.cpp */; };
+		8B0CFB9F29A79188000C4F4C /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
+		8B0CFBA029A79188000C4F4C /* preview_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B24B31C0CA0731B00E92838 /* preview_canvas.cpp */; };
+		8B0CFBA129A79188000C4F4C /* changeatomorderdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */; };
+		8B0CFBA229A79188000C4F4C /* FloatSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */; };
+		8B0CFBA329A79188000C4F4C /* glew.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66740E030FD2000EC27D /* glew.cpp */; };
+		8B0CFBA429A79188000C4F4C /* InputWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66830E031067000EC27D /* InputWizard.cpp */; };
+		8B0CFBA529A79188000C4F4C /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
 		8B2998AB0E48F81900624A73 /* sample.irc in Copy Files (2) (2) (2) (2) (2) (2) (2) */ = {isa = PBXBuildFile; fileRef = 8B2998A90E48F81900624A73 /* sample.irc */; };
 		8B2998AC0E48F81900624A73 /* water.log in Copy Files (2) (2) (2) (2) (2) (2) (2) */ = {isa = PBXBuildFile; fileRef = 8B2998AA0E48F81900624A73 /* water.log */; };
 		8B2998CF0E48FA3100624A73 /* MacMolPlt_Manual.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998CE0E48FA2300624A73 /* MacMolPlt_Manual.html */; };
@@ -362,6 +445,8 @@
 		16B345EE09F9505C005FD3B2 /* coordinateswindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = coordinateswindow.h; path = src/coordinateswindow.h; sourceTree = "<group>"; };
 		16FB432E09F026A300E84C6B /* bondsdlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = bondsdlg.cpp; path = src/bondsdlg.cpp; sourceTree = "<group>"; };
 		16FB432F09F026A300E84C6B /* bondsdlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bondsdlg.h; path = src/bondsdlg.h; sourceTree = "<group>"; };
+		8B0CFBAA29A79188000C4F4C /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B0CFBAB29A79188000C4F4C /* wxMacMolPlt-3.1 copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "wxMacMolPlt-3.1 copy-Info.plist"; path = "/Users/brett/software/wxMacMolPlt/wxMacMolPlt-3.1 copy-Info.plist"; sourceTree = "<absolute>"; };
 		8B1DA3EF0A2BE373009DFD94 /* frameenergy.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = frameenergy.cpp; path = src/frameenergy.cpp; sourceTree = "<group>"; };
 		8B1DA3F00A2BE373009DFD94 /* frameenergy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = frameenergy.h; path = src/frameenergy.h; sourceTree = "<group>"; };
 		8B1DA4730A2E189B009DFD94 /* setPreference.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setPreference.cpp; path = src/setPreference.cpp; sourceTree = "<group>"; };
@@ -486,6 +571,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		8B0CFBA629A79188000C4F4C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B29D6B412B934BD0049477F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -512,6 +604,7 @@
 				8B2998A80E48F7F300624A73 /* Samples */,
 				8B2998CD0E48FA0900624A73 /* Docs */,
 				1652DA0C09D0AE8F00B7783F /* Products */,
+				8B0CFBAB29A79188000C4F4C /* wxMacMolPlt-3.1 copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 			usesTabs = 1;
@@ -521,6 +614,7 @@
 			children = (
 				8B29D6B912B934BD0049477F /* wxMacMolPlt.app */,
 				8B3EAFB51C8A810000AD26F0 /* wxMacMolPlt.app */,
+				8B0CFBAA29A79188000C4F4C /* wxMacMolPlt.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -778,6 +872,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		8B0CFB5029A79188000C4F4C /* wxMacMolPlt-3.2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8B0CFBA729A79188000C4F4C /* Build configuration list for PBXNativeTarget "wxMacMolPlt-3.2" */;
+			buildPhases = (
+				8B0CFB5129A79188000C4F4C /* Resources */,
+				8B0CFB6129A79188000C4F4C /* Sources */,
+				8B0CFBA629A79188000C4F4C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "wxMacMolPlt-3.2";
+			productName = wxMacMolPlt;
+			productReference = 8B0CFBAA29A79188000C4F4C /* wxMacMolPlt.app */;
+			productType = "com.apple.product-type.application";
+		};
 		8B29D61C12B934BD0049477F /* wxMacMolPlt-3.0 cocoa */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8B29D6B612B934BD0049477F /* Build configuration list for PBXNativeTarget "wxMacMolPlt-3.0 cocoa" */;
@@ -818,7 +929,7 @@
 		1652D9FF09D0AE7200B7783F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1300;
 				TargetAttributes = {
 					8B3EAF171C8A810000AD26F0 = {
 						DevelopmentTeam = F28F22W7P9;
@@ -845,11 +956,34 @@
 				8B2998A20E48F78300624A73 /* Dist directory */,
 				8B29D61C12B934BD0049477F /* wxMacMolPlt-3.0 cocoa */,
 				8B3EAF171C8A810000AD26F0 /* wxMacMolPlt-3.1 */,
+				8B0CFB5029A79188000C4F4C /* wxMacMolPlt-3.2 */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		8B0CFB5129A79188000C4F4C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B0CFB5229A79188000C4F4C /* bindoc.icns in Resources */,
+				8B0CFB5329A79188000C4F4C /* MacMolPlt.icns in Resources */,
+				8B0CFB5429A79188000C4F4C /* prefs.icns in Resources */,
+				8B0CFB5529A79188000C4F4C /* text-doc.icns in Resources */,
+				8B0CFB5629A79188000C4F4C /* MacMolPlt.Prefs.xml in Resources */,
+				8B0CFB5729A79188000C4F4C /* arial1.glf in Resources */,
+				8B0CFB5829A79188000C4F4C /* arial1.bmf in Resources */,
+				8B0CFB5929A79188000C4F4C /* BsVeraSans.fdb in Resources */,
+				8B0CFB5A29A79188000C4F4C /* amino_acids.cml in Resources */,
+				8B0CFB5B29A79188000C4F4C /* organics.cml in Resources */,
+				8B0CFB5C29A79188000C4F4C /* solvents.cml in Resources */,
+				8B0CFB5D29A79188000C4F4C /* view.png in Resources */,
+				8B0CFB5E29A79188000C4F4C /* perpixel_dirlight_f.glsl in Resources */,
+				8B0CFB5F29A79188000C4F4C /* perpixel_dirlight_v.glsl in Resources */,
+				8B0CFB6029A79188000C4F4C /* splash.jpg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B29D61D12B934BD0049477F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -897,6 +1031,81 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		8B0CFB6129A79188000C4F4C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B0CFB6229A79188000C4F4C /* AtomTypeList.cpp in Sources */,
+				8B0CFB6329A79188000C4F4C /* BasisSet.cpp in Sources */,
+				8B0CFB6429A79188000C4F4C /* BFiles.cpp in Sources */,
+				8B0CFB6529A79188000C4F4C /* CML.cpp in Sources */,
+				8B0CFB6629A79188000C4F4C /* DataClasses.cpp in Sources */,
+				8B0CFB6729A79188000C4F4C /* Files.cpp in Sources */,
+				8B0CFB6829A79188000C4F4C /* Frame.cpp in Sources */,
+				8B0CFB6929A79188000C4F4C /* GaussHermite.cpp in Sources */,
+				8B0CFB6A29A79188000C4F4C /* Gradient.cpp in Sources */,
+				8B0CFB6B29A79188000C4F4C /* InputData.cpp in Sources */,
+				8B0CFB6C29A79188000C4F4C /* Internals.cpp in Sources */,
+				8B0CFB6D29A79188000C4F4C /* main.cpp in Sources */,
+				8B0CFB6E29A79188000C4F4C /* Math3D.cpp in Sources */,
+				8B0CFB6F29A79188000C4F4C /* MEP.cpp in Sources */,
+				8B0CFB7029A79188000C4F4C /* MMPPrefs.cpp in Sources */,
+				8B0CFB7129A79188000C4F4C /* MoleculeData.cpp in Sources */,
+				8B0CFB7229A79188000C4F4C /* mpGLCanvas.cpp in Sources */,
+				8B0CFB7329A79188000C4F4C /* orbitals.cpp in Sources */,
+				8B0CFB7429A79188000C4F4C /* Progress.cpp in Sources */,
+				8B0CFB7529A79188000C4F4C /* RysPolynomial.cpp in Sources */,
+				8B0CFB7629A79188000C4F4C /* SurfaceBase.cpp in Sources */,
+				8B0CFB7729A79188000C4F4C /* SurfWin.cpp in Sources */,
+				8B0CFB7829A79188000C4F4C /* VirtualSphere.cpp in Sources */,
+				8B0CFB7929A79188000C4F4C /* wxFiles.cpp in Sources */,
+				8B0CFB7A29A79188000C4F4C /* XML.cpp in Sources */,
+				8B0CFB7B29A79188000C4F4C /* MolDisplayWin.cpp in Sources */,
+				8B0CFB7C29A79188000C4F4C /* OpenGLGraphics.cpp in Sources */,
+				8B0CFB7D29A79188000C4F4C /* setscreenplane.cpp in Sources */,
+				8B0CFB7E29A79188000C4F4C /* bondsdlg.cpp in Sources */,
+				8B0CFB7F29A79188000C4F4C /* coordinateswindow.cpp in Sources */,
+				8B0CFB8029A79188000C4F4C /* llmdialog.cpp in Sources */,
+				8B0CFB8129A79188000C4F4C /* setbondlength.cpp in Sources */,
+				8B0CFB8229A79188000C4F4C /* appendframesoptions.cpp in Sources */,
+				8B0CFB8329A79188000C4F4C /* exportoptionsdialog.cpp in Sources */,
+				8B0CFB8429A79188000C4F4C /* printoptions.cpp in Sources */,
+				8B0CFB8529A79188000C4F4C /* aboutwxmacmolplt.cpp in Sources */,
+				8B0CFB8629A79188000C4F4C /* energyplotdialog.cpp in Sources */,
+				8B0CFB8729A79188000C4F4C /* wxMolGraph.cpp in Sources */,
+				8B0CFB8829A79188000C4F4C /* choosevecgroup.cpp in Sources */,
+				8B0CFB8929A79188000C4F4C /* coordinateoffset.cpp in Sources */,
+				8B0CFB8A29A79188000C4F4C /* frameenergy.cpp in Sources */,
+				8B0CFB8B29A79188000C4F4C /* setPreference.cpp in Sources */,
+				8B0CFB8C29A79188000C4F4C /* frequenciesdialog.cpp in Sources */,
+				8B0CFB8D29A79188000C4F4C /* inputfileeditor.cpp in Sources */,
+				8B0CFB8E29A79188000C4F4C /* myPrefs.cpp in Sources */,
+				8B0CFB8F29A79188000C4F4C /* surfaceswindow.cpp in Sources */,
+				8B0CFB9029A79188000C4F4C /* colorArea.cpp in Sources */,
+				8B0CFB9129A79188000C4F4C /* inputbuilder.cpp in Sources */,
+				8B0CFB9229A79188000C4F4C /* surfaceDlg.cpp in Sources */,
+				8B0CFB9329A79188000C4F4C /* wxUglyChoice.cpp in Sources */,
+				8B0CFB9429A79188000C4F4C /* windowparameters.cpp in Sources */,
+				8B0CFB9529A79188000C4F4C /* zmatrixcalculator.cpp in Sources */,
+				8B0CFB9629A79188000C4F4C /* glf.cpp in Sources */,
+				8B0CFB9729A79188000C4F4C /* qtexport.cpp in Sources */,
+				8B0CFB9829A79188000C4F4C /* symmetrypointgroupdlg.cpp in Sources */,
+				8B0CFB9929A79188000C4F4C /* swfexport-g.cpp in Sources */,
+				8B0CFB9A29A79188000C4F4C /* selectfiletype.cpp in Sources */,
+				8B0CFB9B29A79188000C4F4C /* swfexport.cpp in Sources */,
+				8B0CFB9C29A79188000C4F4C /* Geometries.cpp in Sources */,
+				8B0CFB9D29A79188000C4F4C /* ChooseDialog.cpp in Sources */,
+				8B0CFB9E29A79188000C4F4C /* MyTypes.cpp in Sources */,
+				8B0CFB9F29A79188000C4F4C /* build_palette.cpp in Sources */,
+				8B0CFBA029A79188000C4F4C /* preview_canvas.cpp in Sources */,
+				8B0CFBA129A79188000C4F4C /* changeatomorderdialog.cpp in Sources */,
+				8B0CFBA229A79188000C4F4C /* FloatSlider.cpp in Sources */,
+				8B0CFBA329A79188000C4F4C /* glew.cpp in Sources */,
+				8B0CFBA429A79188000C4F4C /* InputWizard.cpp in Sources */,
+				8B0CFBA529A79188000C4F4C /* fmofragmentationdialog.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8B29D62E12B934BD0049477F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1147,6 +1356,206 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "src/ming-src/";
+			};
+			name = Release;
+		};
+		8B0CFBA829A79188000C4F4C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = F28F22W7P9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = NO;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = NO;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = NO;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OBJROOT = "$(SYMROOT)";
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CODE_SIGN_FLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-I$(HOME)/software/wx/wx-3.2-debug/lib/wx/include/osx_cocoa-unicode-static-3.2/",
+					"-I$(HOME)/software/wx/wx-3.2-debug/include/wx-3.2",
+					"-D__WXDEBUG__",
+					"-D__WXOSX__",
+					"-D__WXOSX_COCOA__",
+					"-D__WXMAC__",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-DNO_GCC_PRAGMA",
+				);
+				OTHER_LDFLAGS = (
+					"-L$(HOME)/software/wx/wx-3.2-debug/lib/",
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					Cocoa,
+					"-framework",
+					System,
+					"-lwx_baseu-3.2",
+					"-lwx_osx_cocoau_core-3.2",
+					"-lwx_osx_cocoau_adv-3.2",
+					"-lwx_osx_cocoau_gl-3.2",
+					"-lexpat",
+					"-lwxtiff-3.2",
+					"-lwxjpeg-3.2",
+					"-lwxpng-3.2",
+					"-lwx_osx_cocoau_html-3.2",
+					"-lz",
+					"-lpthread",
+					"-liconv",
+					"-framework",
+					WebKit,
+					"-framework",
+					OpenGL,
+					"-framework",
+					AGL,
+					"-framework",
+					QuartzCore,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = gov.ameslab.wxMacMolplt;
+				PRODUCT_NAME = wxMacMolPlt;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		8B0CFBA929A79188000C4F4C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
+				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
+				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
+				CODE_SIGN_ENTITLEMENTS = wxMacMolPltRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = F28F22W7P9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = NO;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OBJROOT = "$(SYMROOT)";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CODE_SIGN_FLAGS = "--timestamp";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-I$(HOME)/software/wx/wx-3.2-release/lib/wx/include/osx_cocoa-unicode-static-3.2/",
+					"-I$(HOME)/software/wx/wx-3.2-release/include/wx-3.2",
+					"-D__WXMAC__",
+					"-D__WXOSX__",
+					"-D__WXOSX_COCOA__",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-DNO_GCC_PRAGMA",
+				);
+				OTHER_LDFLAGS = (
+					"-L$(HOME)/software/wx/wx-3.2-release/lib",
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					Cocoa,
+					"-framework",
+					System,
+					"-lwx_baseu-3.2",
+					"-lwx_osx_cocoau_core-3.2",
+					"-lwx_osx_cocoau_adv-3.2",
+					"-lwx_osx_cocoau_gl-3.2",
+					"-lexpat",
+					"-lwxtiff-3.2",
+					"-lwxjpeg-3.2",
+					"-lwxpng-3.2",
+					"-lwx_osx_cocoau_html-3.2",
+					"-lz",
+					"-lpthread",
+					"-liconv",
+					"-framework",
+					WebKit,
+					"-framework",
+					OpenGL,
+					"-framework",
+					AGL,
+					"-framework",
+					QuartzCore,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = gov.ameslab.wxMacMolplt;
+				PRODUCT_NAME = wxMacMolPlt;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				STRIP_INSTALLED_PRODUCT = NO;
+				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
 		};
@@ -1460,7 +1869,7 @@
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
 				CODE_SIGN_ENTITLEMENTS = wxMacMolPltRelease.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1549,6 +1958,15 @@
 			buildConfigurations = (
 				1652DA0109D0AE7200B7783F /* Debug */,
 				1652DA0209D0AE7200B7783F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B0CFBA729A79188000C4F4C /* Build configuration list for PBXNativeTarget "wxMacMolPlt-3.2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B0CFBA829A79188000C4F4C /* Debug */,
+				8B0CFBA929A79188000C4F4C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
