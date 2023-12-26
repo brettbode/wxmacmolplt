@@ -3811,6 +3811,13 @@ void WindowData::Validate(wxRect & testRect) {
 			else if (testRect.height > displayRect.height) testRect.height = displayRect.height;
 			valid = true;
 			break;
+		} else if (displayCount == 1) {
+			//work around issue in wx not defaulting the window size correctly
+			if (testRect.x < displayRect.x) testRect.x = displayRect.x;
+			if (testRect.y < displayRect.y) testRect.y = displayRect.y;
+			if (testRect.x >= (displayRect.x + displayRect.width)) testRect.x = displayRect.x;
+			if (testRect.y >= (displayRect.y + displayRect.height)) testRect.y = displayRect.y;
+			valid = true;
 		}
 	}
 	if (!valid) {
