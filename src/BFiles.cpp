@@ -261,7 +261,10 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 	TextFileType	Type=kUnknown;
 
 	//Test for a non-ascii file (could be binary or unicode)
-	for (int i=0; i<BufferSize; i++) {
+	//limit this searh due to some cases of unicode in the rungms script output
+	//prior to the actual GAMESS log output
+	wxFileOffset headerlength=(10<BufferSize)?10:BufferSize;
+	for (int i=0; i<headerlength; i++) {
 		if ((Buffer[i] < 9)||(Buffer[i] > 126)) return kUnknown;
 	}
 	ByteCount = BufferSize;
