@@ -47,12 +47,9 @@ IMPLEMENT_DYNAMIC_CLASS( SetBondLength, wxDialog )
 BEGIN_EVENT_TABLE( SetBondLength, wxDialog )
 
 ////@begin SetBondLength event table entries
-    EVT_TEXT( ID_MAXLENGTHEDIT, SetBondLength::OnMaxlengtheditUpdated )
-
-    EVT_CHECKBOX( ID_NORMALCHECKBOX, SetBondLength::OnNormalcheckboxClick )
-
-    EVT_BUTTON( wxID_OK, SetBondLength::OnOkClick )
-
+	EVT_TEXT( ID_MAXLENGTHEDIT, SetBondLength::OnMaxlengtheditUpdated )
+	EVT_CHECKBOX( ID_NORMALCHECKBOX, SetBondLength::OnNormalcheckboxClick )
+	EVT_BUTTON( wxID_OK, SetBondLength::OnOkClick )
 ////@end SetBondLength event table entries
 
 END_EVENT_TABLE()
@@ -77,20 +74,20 @@ SetBondLength::SetBondLength( MolDisplayWin* parent, wxWindowID id, const wxStri
 bool SetBondLength::Create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin SetBondLength member initialisation
-    maxValueEdit = NULL;
-    keepOldBondsCheck = NULL;
-    normalBondCheck = NULL;
-    normalText = NULL;
-    normalTolSlider = NULL;
-    guessBondCheck = NULL;
-    hhCheck = NULL;
-    hydrogenCheck = NULL;
+	maxValueEdit = NULL;
+	keepOldBondsCheck = NULL;
+	normalBondCheck = NULL;
+	normalText = NULL;
+	normalTolSlider = NULL;
+	guessBondCheck = NULL;
+	hhCheck = NULL;
+	hydrogenCheck = NULL;
 ////@end SetBondLength member initialisation
 	Parent = parent;
 
 ////@begin SetBondLength creation
-    SetExtraStyle(GetExtraStyle()|wxWS_EX_BLOCK_EVENTS);
-    wxDialog::Create( parent, id, caption, pos, size, style );
+	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
+	wxDialog::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
     GetSizer()->Fit(this);
@@ -112,10 +109,10 @@ void SetBondLength::CreateControls()
     wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
     itemDialog1->SetSizer(itemBoxSizer2);
 
-    wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("Maximum inter-atomic distance to be\nconsidered a bond:"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("Maximum inter-atomic distance to be\nconsidered a bond:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    maxValueEdit = new wxTextCtrl( itemDialog1, ID_MAXLENGTHEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+	maxValueEdit = new wxTextCtrl( itemDialog1, ID_MAXLENGTHEDIT, _T(""), wxDefaultPosition, wxSize(100, -1), 0 );
     if (ShowToolTips())
         maxValueEdit->SetToolTip(_("Enter a value to apply a flat maximum distance, or 0 to ignore."));
     itemBoxSizer2->Add(maxValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -223,8 +220,8 @@ wxIcon SetBondLength::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin SetBondLength icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
+	wxUnusedVar(name);
+	return wxNullIcon;
 ////@end SetBondLength icon retrieval
 }
 /*!
