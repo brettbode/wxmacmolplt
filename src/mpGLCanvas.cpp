@@ -532,7 +532,6 @@ void MpGLCanvas::eventSize(wxSizeEvent &event) {
 	(void) event;
 #endif
 	double scaleContent = GetContentScaleFactor();
-	double scaleDPI = GetDPIScaleFactor();
 	GetClientSize(&width, &height);
 	width *= scaleContent;
 	height *= scaleContent;
