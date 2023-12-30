@@ -1,3 +1,9 @@
+wxmacmolplt (7.7.3-1) Bullseye; urgency=low
+
+  * New upstream release
+
+ -- Brett Bode <MMP.Guy@gmail.com>  Fri, 29 Dec 2023 12:01:27 -0500
+
 wxmacmolplt (7.7.2-1) Bullseye; urgency=low
 
   * New upstream release

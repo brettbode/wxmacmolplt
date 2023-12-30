@@ -13,6 +13,12 @@ current release before reporting it.</P>
 <P>
 <HR WIDTH="80%">
 </P><BR>
+<P>Version 7.7.3:</P>
+<UL>
+	<LI>Updated Mac build to use wxWidgets 3.2.4 which appears to finally resolve the hi-res screeen display problem at last. If you had issues with the molecule display appearing only in 1/4 of the screen in previous versions, it should now be fixed. Unfortunately it has created a new Mac only issue with the atom preferences window display.
+	<LI>Altered unicode check to allow a bit of unicode from the rungms script output prior to the start of the actual GAMESS output.
+	<LI>Altered the logic for when paste is allowed due to Macs seemly always provding unicode text. This should get Pasting of coordinates working again, but the coordinates themselves still need to be plain text.
+</UL>
 <P>Version 7.7.2:</P>
 <UL>
 	<LI>Corrected bug in the computation of shell screen for 3D orbital computations.
