@@ -23,15 +23,15 @@ Version 7.7 is available for those with older systems:
   <LI>Do you need a binary for a 32 bit x86 or PPC based system or an older OS? Please let <a href="mailto:MMP.Guy@gmail.com">me</a> know.
 </UL>
 <H3>Windows 64 bit</H3>
-This 64 bit binary is built on Windows 10 with VS2019 on wx 3.0.5. 
+This 64 bit binary is built on Windows 10 with VS2019 on wx 3.2.4. 
 The binary will ONLY run on 64 bit Windows systems (which should be most systems).
 <UL>
-<LI><a href="https://uofi.box.com/s/jr4r10qoe0ho4mqt30bbj1cgoer5cg10">
-	64-bit binary for Windows (v 7.7.2) packaged as a Windows installer binary</a> (Ignore the box.com warning)
-<LI><a href="https://uofi.box.com/shared/static/nkyx39o9sijdets9bcttp74z6fgs2vqf.zip">
+<LI><a href="https://uofi.box.com/s/2rlq5sxskpsv9w8yge7wc050lt5nfh4i">
+	64-bit binary for Windows (v 7.7.3) packaged as a Windows installer binary</a> (Ignore the box.com warning)
+<LI><a href="https://uofi.box.com/shared/static/teix5bxag1vibxk07l6fj4rr1e42psan.zip">
 	Same as the previous, but packaged as a zip file</a> (This provides a direct download link, but you will have to manually run the installer)
 <LI>For those that prefer not to run an installer here is the exact same binary
-as a <a href="https://uofi.box.com/shared/static/gdjyrxscqr7475281roijhl2zxsfvyn7.zip">plain zip archive</a>. 
+as a <a href="https://uofi.box.com/shared/static/yuerol1elo3fnkatizm8uz34vnsrbgwv.zip">plain zip archive</a>. 
 These appear to include the required runtime libraries in the package. However, 
 if the application fails to launch saying MSVCP140.dll is missing then you will need to download and install the <a href="https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0">Visual Studio 2019 runtime libraries</a>. 
 <!--If you have a machine where you are not allowed to install the Microsoft libraries you can simply copy msvcp120.dll and msvcr120.dll from another machine into the same directory as the wxmacmolplt executable. Windows will search for the dlls in the same directory as the executable as well as the system path.-->
@@ -51,16 +51,19 @@ newer OS levels.
 <H3>Linux</H3>
 <UL>
   <LI>Here is a source distribution primarily targeted at Linux: 
-   <a href="https://uofi.box.com/shared/static/ezm1jd56hlb8s2vsf9ou28vrctjqqa9o.gz">wxmacmolplt 7.7.2</a>.
+   <a href="https://uofi.box.com/shared/static/i4ljyf53c1jveymhsg4wuwad4a49fm6f.gz">wxmacmolplt 7.7.3</a>.
 </UL>
 Binaries are available for a variety of Linux distribution. Often a binary rpm can be used on a version or two newer than the one on which it was created.
 <UL>
-  <LI><a href="https://uofi.box.com/shared/static/xzk18smv4f5701w2uqpdtggqdfxuwz3z.deb">Debian 11 Bullseye/Ubuntu/etc with wx 3.0.5 x86_64 binary.deb</a> (Note you can build this on your system by running debuild in the top directory of the source)
-  <LI><a href="https://uofi.box.com/shared/static/k8uybbbfmy50eukexy3y4zfin1aoso8b.deb">Debian 10 Buster/Ubuntu/etc with wx 3.0.4 x86_64 binary.deb</a> (Note you can build this on your system by running debuild in the top directory of the source)
+  <LI><a href="https://uofi.box.com/shared/static/58uyoiufh93uum6inznixzodfitqx0dk.deb">Debian 12 BookWorm/Ubuntu/etc with wx 3.2.2 x86_64 binary.deb</a> 
+  <LI><a href="https://uofi.box.com/shared/static/y5yigl6sgws0rkj8174mricby65k40ob.deb">Debian 11 Bullseye/Ubuntu/etc with wx 3.0.5 x86_64 binary.deb</a> (Note you can build this on your system by running debuild in the top directory of the source)
+  <LI><a href="https://uofi.box.com/shared/static/fdvrtp91b7k95rv0l0ydcvd1tmtbqw5z.deb">Debian 10 Buster/Ubuntu/etc with wx 3.0.4 x86_64 binary.deb</a> (Note you can build this on your system by running debuild in the top directory of the source)
+<!--
   <LI><a href="https://uofi.box.com/shared/static/zva8q04kv0nmvpj2gz5pnl2brf9hoqo7.deb">Debian Jessie/Ubuntu x86_64 binary.deb</a> (Note you can build this on your system by running debuild in the top directory of the source)
   <LI><a href="https://uofi.box.com/shared/static/4z2l3ixyqmhw7y7wslmgttncqa0jp3tq.rpm">Fedora 34 - x86_64 architecture</a>
   <LI><a href="https://uofi.box.com/shared/static/swki4k5k0q21l42nev1mxzzkfgsnzjcx.rpm">openSUSE 15.x with the optional wxWidgets 3.1.1 install - x86_64 architecture</a>
   <LI><a href="https://uofi.box.com/shared/static/u2o6bekvqpi5jek5cakhrtof3demzoc9.rpm">RHEL/CentOS 8.x - x86_64 architecture</a>
+-->
 </UL>
 <!--
 <H3>Debian/Ubuntu Linux</H3>
@@ -107,7 +110,7 @@ to add "--allow-unauthenticated" to your apt-get command.</P>
 <H2>Source Code</H2>
 If none of those work for you download the source code and follow the instructions below or in the INSTALL file contained in the source tar file. The prerequisites for building MacMolPlt from source are a working C++ compiler (g++ preferred) and a wxWidgets (version 2.6.3 or newer, but 3.0 or newer recommended) install including the development pieces. You can test for a working wxWidgets install using wx-config --version. If the response is 2.6.3 or greater you should be fine and you can go directly to building MacMolPlt below. If you have hardware supporting stereo display (quad-buffered OpenGL) you may wish to grab the latest wxWidgets 3.x release to enable stereo support in MacMolPlt. If your Linux distribution does not offer a prebuilt wxWidgets package, usually named something like wxGTK or libwxgtk version 2.6.3 or newer then you will have to first build and install wxWidgets. Follow these steps to build wxWidgets:
 <p>
-Download the latest wxWidgets source (2.6.3 through 3.1.5 have worked in the past). Unpack the archive and cd into the top level directory.
+Download the latest wxWidgets source (2.6.3 through 3.2.4 have worked in the past). Unpack the archive and cd into the top level directory.
 <P>
 Configure wx to use OpenGL and unicode:<br>
 ./configure --with-gtk --with-opengl --enable-unicode<BR>
